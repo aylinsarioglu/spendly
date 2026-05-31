@@ -1,13 +1,12 @@
-import type { ExpenseCategoryOption } from '../types/expense';
+export type CategoryOption = {
+  name: string;
+  emoji: string;
+};
 
-export const expenseCategoryOptions: ExpenseCategoryOption[] = [
-  { id: '1', emoji: '🍔', name: 'Yemek' },
-  { id: '2', emoji: '🚕', name: 'Ulaşım' },
-  { id: '3', emoji: '🛍️', name: 'Alışveriş' },
+export const categoryOptions: CategoryOption[] = [
+  { name: 'Yemek', emoji: '🍔' },
+  { name: 'Ulaşım', emoji: '🚕' },
+  { name: 'Alışveriş', emoji: '🛍️' },
 ];
 
-export function getCategoryOptionById(
-  id: string,
-): ExpenseCategoryOption | undefined {
-  return expenseCategoryOptions.find((option) => option.id === id);
-}
+export const defaultCategory = categoryOptions[0]?.name ?? 'Yemek';

@@ -5,14 +5,14 @@ import type { BalanceCardProps } from '../types/expense';
 import { formatCurrency } from '../utils/formatCurrency';
 
 export function BalanceCard({
-  amount,
+  total,
   categoryCount,
   label = 'Toplam Harcama',
 }: BalanceCardProps) {
   return (
     <View style={styles.card}>
       <Text style={styles.label}>{label}</Text>
-      <Text style={styles.amount}>{formatCurrency(amount)}</Text>
+      <Text style={styles.amount}>{formatCurrency(total)}</Text>
       <View style={styles.badge}>
         <Text style={styles.badgeText}>{categoryCount} kategori</Text>
       </View>

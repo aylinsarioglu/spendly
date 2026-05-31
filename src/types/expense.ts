@@ -1,37 +1,20 @@
-export type ExpenseCategory = {
+export type Expense = {
   id: string;
-  emoji: string;
-  name: string;
   amount: number;
-};
-
-export type ExpenseCategoryOption = {
-  id: string;
+  category: string;
   emoji: string;
-  name: string;
-};
-
-export type NewExpense = {
-  amount: number;
-  categoryId: string;
-  categoryName: string;
-  note: string;
-};
-
-export type ExpenseFormState = {
-  amount: string;
-  categoryId: string;
   note: string;
 };
 
 export type BalanceCardProps = {
-  amount: number;
+  total: number;
   categoryCount: number;
   label?: string;
 };
 
 export type CategoryCardProps = {
-  category: ExpenseCategory;
+  expense: Expense;
+  onLongPress?: (expense: Expense) => void;
 };
 
 export type FloatingButtonProps = {
@@ -39,7 +22,13 @@ export type FloatingButtonProps = {
 };
 
 export type AddExpenseModalProps = {
-  visible: boolean;
+  isOpen: boolean;
   onClose: () => void;
-  onSave: (expense: NewExpense) => void;
+  onSave: (expense: Expense) => void;
+};
+
+export type DeleteConfirmModalProps = {
+  isOpen: boolean;
+  onCancel: () => void;
+  onDelete: () => void;
 };
