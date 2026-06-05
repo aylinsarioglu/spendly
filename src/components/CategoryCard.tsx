@@ -1,23 +1,20 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../theme/colors';
 import type { CategoryCardProps } from '../types/expense';
 import { formatCurrency } from '../utils/formatCurrency';
 
-export function CategoryCard({ expense, onLongPress }: CategoryCardProps) {
+export function CategoryCard({ category }: CategoryCardProps) {
   return (
-    <Pressable
-      onLongPress={() => onLongPress?.(expense)}
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-    >
+    <View style={styles.card}>
       <View style={styles.left}>
         <View style={styles.emojiContainer}>
-          <Text style={styles.emoji}>{expense.emoji}</Text>
+          <Text style={styles.emoji}>{category.emoji}</Text>
         </View>
-        <Text style={styles.name}>{expense.category}</Text>
+        <Text style={styles.name}>{category.category}</Text>
       </View>
-      <Text style={styles.amount}>{formatCurrency(expense.amount)}</Text>
-    </Pressable>
+      <Text style={styles.amount}>{formatCurrency(category.amount)}</Text>
+    </View>
   );
 }
 
@@ -31,10 +28,6 @@ const styles = StyleSheet.create({
     padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  cardPressed: {
-    opacity: 0.85,
-    backgroundColor: colors.cardElevated,
   },
   left: {
     flexDirection: 'row',
