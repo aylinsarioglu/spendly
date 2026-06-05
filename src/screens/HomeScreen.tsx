@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AddExpenseModal } from '../components/AddExpenseModal';
 import { BalanceCard } from '../components/BalanceCard';
 import { CategoryCard } from '../components/CategoryCard';
+import { ExpenseDetailModal } from '../components/ExpenseDetailModal';
 import { FloatingButton } from '../components/FloatingButton';
 import { TransactionCard } from '../components/TransactionCard';
 import { colors } from '../theme/colors';
@@ -22,6 +23,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   const total = useMemo(
     () => expenses.reduce((sum, expense) => sum + expense.amount, 0),
@@ -45,6 +47,11 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
     setIsOpen(false);
   };
 
+  const handleDeleteExpense = (expenseId: string) => {
+    setExpenses((prev) => prev.filter((exp) => exp.id !== expenseId));
+    setSelectedExpense(null);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <StatusBar style="light" />
@@ -64,7 +71,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         <BalanceCard total={total} categoryCount={categoryCount} />
 
         <View style={styles.categorySection}>
-          <Text style={styles.sectionTitle}>Kategoriler</Text>
+          <Text style={styles.sectionTitle}>Category Summary</Text>
           <View style={styles.categoryList}>
             {groupedCategories.map((category) => (
               <CategoryCard key={category.category} category={category} />
@@ -76,7 +83,11 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
           <Text style={styles.sectionTitle}>Recent Transactions</Text>
           <View style={styles.categoryList}>
             {recentTransactions.map((expense) => (
-              <TransactionCard key={expense.id} expense={expense} />
+              <TransactionCard
+                key={expense.id}
+                expense={expense}
+                onPress={setSelectedExpense}
+              />
             ))}
           </View>
         </View>
@@ -88,6 +99,13 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onSave={handleAddExpense}
+      />
+
+      <ExpenseDetailModal
+        visible={selectedExpense !== null}
+        expense={selectedExpense}
+        onClose={() => setSelectedExpense(null)}
+        onDelete={handleDeleteExpense}
       />
     </SafeAreaView>
   );

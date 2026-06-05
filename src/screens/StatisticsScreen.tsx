@@ -1,4 +1,11 @@
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useMemo } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,8 +17,16 @@ import { getExpenseStatistics, getPieChartData } from '../utils/statisticsHelper
 export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
-  const statistics = getExpenseStatistics(expenses);
-  const pieChartData = getPieChartData(expenses);
+
+  const statistics = useMemo(
+    () => getExpenseStatistics(expenses),
+    [expenses],
+  );
+
+  const pieChartData = useMemo(
+    () => getPieChartData(statistics.categorySummary),
+    [statistics.categorySummary],
+  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
@@ -34,12 +49,12 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
             value={formatCurrency(statistics.totalSpending)}
           />
           <StatCard
-            label="İşlem Sayısı"
+            label="Toplam İşlem"
             value={statistics.transactionCount.toString()}
           />
           <StatCard
-            label="En Çok Kategori"
-            value={statistics.mostUsedCategory}
+            label="En Çok Harcanan Kategori"
+            value={statistics.highestSpendingCategory}
             fullWidth
           />
         </View>
@@ -66,7 +81,7 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
         ) : null}
 
         <View style={styles.categorySection}>
-          <Text style={styles.sectionTitle}>Kategori Bazlı Harcamalar</Text>
+          <Text style={styles.sectionTitle}>Kategori Toplamları</Text>
           <View style={styles.categoryList}>
             {statistics.categorySpending.map((item) => (
               <View key={item.category} style={styles.categoryRow}>

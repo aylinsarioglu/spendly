@@ -1,14 +1,17 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../theme/colors';
 import type { TransactionCardProps } from '../types/expense';
 import { formatCurrency } from '../utils/formatCurrency';
 
-export function TransactionCard({ expense }: TransactionCardProps) {
-  const note = expense.note.trim() || '—';
+export function TransactionCard({ expense, onPress }: TransactionCardProps) {
+  const note = expense.note.trim() || 'No note';
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      onPress={() => onPress?.(expense)}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    >
       <View style={styles.emojiContainer}>
         <Text style={styles.emoji}>{expense.emoji}</Text>
       </View>
@@ -21,7 +24,7 @@ export function TransactionCard({ expense }: TransactionCardProps) {
       </View>
 
       <Text style={styles.amount}>{formatCurrency(expense.amount)}</Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -36,6 +39,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  cardPressed: {
+    opacity: 0.88,
+    backgroundColor: colors.cardElevated,
   },
   emojiContainer: {
     width: 40,

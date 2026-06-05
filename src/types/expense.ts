@@ -26,6 +26,14 @@ export type CategoryCardProps = {
 
 export type TransactionCardProps = {
   expense: Expense;
+  onPress?: (expense: Expense) => void;
+};
+
+export type ExpenseDetailModalProps = {
+  visible: boolean;
+  expense?: Expense | null;
+  onClose: () => void;
+  onDelete: (expenseId: string) => void;
 };
 
 export type FloatingButtonProps = {
@@ -36,12 +44,6 @@ export type AddExpenseModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSave: (expense: Expense) => void;
-};
-
-export type DeleteConfirmModalProps = {
-  isOpen: boolean;
-  onCancel: () => void;
-  onDelete: () => void;
 };
 
 export type HomeScreenProps = {
@@ -63,7 +65,8 @@ export type CategorySpending = {
 export type ExpenseStatistics = {
   totalSpending: number;
   transactionCount: number;
-  mostUsedCategory: string;
+  highestSpendingCategory: string;
+  categorySummary: GroupedCategory[];
   categorySpending: CategorySpending[];
 };
 
