@@ -8,15 +8,10 @@ export function ExpenseDetailModal({
   visible,
   expense,
   onClose,
+  onEdit,
   onDelete,
 }: ExpenseDetailModalProps) {
   const note = expense?.note.trim() || 'No note';
-
-  const handleDelete = () => {
-    if (expense) {
-      onDelete(expense.id);
-    }
-  };
 
   return (
     <Modal
@@ -58,6 +53,16 @@ export function ExpenseDetailModal({
                   ]}
                 >
                   <Text style={styles.closeButtonText}>Close</Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => onEdit(expense)}
+                  style={({ pressed }) => [
+                    styles.editButton,
+                    pressed && styles.buttonPressed,
+                  ]}
+                >
+                  <Text style={styles.editButtonText}>Edit</Text>
                 </Pressable>
 
                 <Pressable
@@ -173,7 +178,7 @@ const styles = StyleSheet.create({
   actions: {
     width: '100%',
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
   closeButton: {
     flex: 1,
@@ -183,6 +188,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.input,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  editButton: {
+    flex: 1,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+    backgroundColor: colors.accentSoft,
+    borderWidth: 1,
+    borderColor: colors.accent,
   },
   deleteButton: {
     flex: 1,
@@ -200,6 +214,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.textSecondary,
+  },
+  editButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.accent,
   },
   deleteButtonText: {
     fontSize: 16,

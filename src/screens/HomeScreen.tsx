@@ -22,8 +22,9 @@ import { groupExpensesByCategory } from '../utils/groupExpensesByCategory';
 export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
-  const [isOpen, setIsOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const total = useMemo(
     () => expenses.reduce((sum, expense) => sum + expense.amount, 0),
@@ -42,9 +43,34 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
 
   const recentTransactions = useMemo(() => expenses.slice(0, 5), [expenses]);
 
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setEditingExpense(null);
+  };
+
+  const handleOpenCreate = () => {
+    setEditingExpense(null);
+    setIsFormOpen(true);
+  };
+
   const handleAddExpense = (expense: Expense) => {
     setExpenses((prev) => [expense, ...prev]);
-    setIsOpen(false);
+    handleCloseForm();
+  };
+
+  const handleUpdateExpense = (expense: Expense) => {
+    setExpenses((prev) =>
+      prev.map((item) => (item.id === expense.id ? expense : item)),
+    );
+    setIsFormOpen(false);
+    setEditingExpense(null);
+    setSelectedExpense(null);
+  };
+
+  const handleEditExpense = (expense: Expense) => {
+    setSelectedExpense(null);
+    setEditingExpense(expense);
+    setIsFormOpen(true);
   };
 
   const handleDeleteExpense = (expenseId: string) => {
@@ -93,18 +119,21 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         </View>
       </ScrollView>
 
-      <FloatingButton onPress={() => setIsOpen(true)} />
+      <FloatingButton onPress={handleOpenCreate} />
 
       <AddExpenseModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        isOpen={isFormOpen}
+        expense={editingExpense}
+        onClose={handleCloseForm}
         onSave={handleAddExpense}
+        onUpdate={handleUpdateExpense}
       />
 
       <ExpenseDetailModal
         visible={selectedExpense !== null}
         expense={selectedExpense}
         onClose={() => setSelectedExpense(null)}
+        onEdit={handleEditExpense}
         onDelete={handleDeleteExpense}
       />
     </SafeAreaView>

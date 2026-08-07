@@ -33,6 +33,7 @@ export type ExpenseDetailModalProps = {
   visible: boolean;
   expense?: Expense | null;
   onClose: () => void;
+  onEdit: (expense: Expense) => void;
   onDelete: (expenseId: string) => void;
 };
 
@@ -44,6 +45,8 @@ export type AddExpenseModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSave: (expense: Expense) => void;
+  onUpdate: (expense: Expense) => void;
+  expense?: Expense | null;
 };
 
 export type HomeScreenProps = {

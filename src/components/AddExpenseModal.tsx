@@ -15,11 +15,19 @@ import { categoryOptions, defaultCategory } from '../data/categoryOptions';
 import { colors } from '../theme/colors';
 import type { AddExpenseModalProps } from '../types/expense';
 
-export function AddExpenseModal({ isOpen, onClose, onSave }: AddExpenseModalProps) {
+export function AddExpenseModal({
+  isOpen,
+  onClose,
+  onSave,
+  onUpdate,
+  expense = null,
+}: AddExpenseModalProps) {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState(defaultCategory);
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const isEditMode = expense !== null;
 
   useEffect(() => {
     if (!isOpen) {
@@ -27,8 +35,22 @@ export function AddExpenseModal({ isOpen, onClose, onSave }: AddExpenseModalProp
       setCategory(defaultCategory);
       setNote('');
       setError(null);
+      return;
     }
-  }, [isOpen]);
+
+    if (expense) {
+      setAmount(String(expense.amount));
+      setCategory(expense.category);
+      setNote(expense.note);
+      setError(null);
+      return;
+    }
+
+    setAmount('');
+    setCategory(defaultCategory);
+    setNote('');
+    setError(null);
+  }, [isOpen, expense]);
 
   const handleSave = () => {
     const parsedAmount = Number(amount);
@@ -41,14 +63,25 @@ export function AddExpenseModal({ isOpen, onClose, onSave }: AddExpenseModalProp
     const selectedCategory = categoryOptions.find(
       (option) => option.name === category,
     );
+    const emoji = selectedCategory?.emoji ?? expense?.emoji ?? '';
 
-    onSave({
-      id: Date.now().toString(),
-      amount: parsedAmount,
-      category,
-      emoji: selectedCategory?.emoji ?? '',
-      note,
-    });
+    if (expense) {
+      onUpdate({
+        id: expense.id,
+        amount: parsedAmount,
+        category,
+        emoji,
+        note,
+      });
+    } else {
+      onSave({
+        id: Date.now().toString(),
+        amount: parsedAmount,
+        category,
+        emoji,
+        note,
+      });
+    }
 
     onClose();
   };
@@ -75,8 +108,14 @@ export function AddExpenseModal({ isOpen, onClose, onSave }: AddExpenseModalProp
             contentContainerStyle={styles.content}
           >
             <View style={styles.header}>
-              <Text style={styles.title}>Harcama Ekle</Text>
-              <Text style={styles.subtitle}>Yeni bir gider kaydet</Text>
+              <Text style={styles.title}>
+                {isEditMode ? 'Harcama Düzenle' : 'Harcama Ekle'}
+              </Text>
+              <Text style={styles.subtitle}>
+                {isEditMode
+                  ? 'Mevcut gideri güncelle'
+                  : 'Yeni bir gider kaydet'}
+              </Text>
             </View>
 
             <View style={styles.field}>
@@ -161,7 +200,9 @@ export function AddExpenseModal({ isOpen, onClose, onSave }: AddExpenseModalProp
                   pressed && styles.buttonPressed,
                 ]}
               >
-                <Text style={styles.saveButtonText}>Kaydet</Text>
+                <Text style={styles.saveButtonText}>
+                  {isEditMode ? 'Güncelle' : 'Kaydet'}
+                </Text>
               </Pressable>
             </View>
           </ScrollView>
