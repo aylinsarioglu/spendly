@@ -65,7 +65,9 @@ export type CategorySpending = {
 export type ExpenseStatistics = {
   totalSpending: number;
   transactionCount: number;
+  averageSpending: number;
   highestSpendingCategory: string;
+  highestSpendingCategoryEmoji: string;
   categorySummary: GroupedCategory[];
   categorySpending: CategorySpending[];
 };

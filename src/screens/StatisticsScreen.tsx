@@ -10,13 +10,17 @@ import { PieChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors } from '../theme/colors';
-import type { StatisticsScreenProps } from '../types/expense';
+import type { CategorySpending, StatisticsScreenProps } from '../types/expense';
 import { formatCurrency } from '../utils/formatCurrency';
-import { getExpenseStatistics, getPieChartData } from '../utils/statisticsHelpers';
+import {
+  getExpenseStatistics,
+  getPieChartData,
+} from '../utils/statisticsHelpers';
 
 export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
+  const chartWidth = width - horizontalPadding * 2 - 32;
 
   const statistics = useMemo(
     () => getExpenseStatistics(expenses),
@@ -27,6 +31,11 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
     () => getPieChartData(statistics.categorySummary),
     [statistics.categorySummary],
   );
+
+  const highestCategoryLabel =
+    statistics.highestSpendingCategoryEmoji.length > 0
+      ? `${statistics.highestSpendingCategoryEmoji} ${statistics.highestSpendingCategory}`
+      : statistics.highestSpendingCategory;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
@@ -53,23 +62,28 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
             value={statistics.transactionCount.toString()}
           />
           <StatCard
-            label="En Çok Harcanan Kategori"
-            value={statistics.highestSpendingCategory}
-            fullWidth
+            label="Ortalama Harcama"
+            value={formatCurrency(statistics.averageSpending)}
+          />
+          <StatCard
+            label="En Çok Harcama Yapılan Kategori"
+            value={highestCategoryLabel}
           />
         </View>
 
         {pieChartData.length > 0 ? (
           <View style={styles.chartSection}>
-            <Text style={styles.sectionTitle}>Kategori Dağılımı</Text>
             <View style={styles.chartCard}>
               <PieChart
                 data={pieChartData}
-                width={width - horizontalPadding * 2 - 32}
+                width={chartWidth}
                 height={220}
                 chartConfig={{
                   color: () => colors.textPrimary,
                   labelColor: () => colors.textSecondary,
+                  backgroundGradientFrom: colors.card,
+                  backgroundGradientTo: colors.card,
+                  decimalPlaces: 0,
                 }}
                 accessor="population"
                 backgroundColor="transparent"
@@ -81,25 +95,18 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
         ) : null}
 
         <View style={styles.categorySection}>
-          <Text style={styles.sectionTitle}>Kategori Toplamları</Text>
-          <View style={styles.categoryList}>
-            {statistics.categorySpending.map((item) => (
-              <View key={item.category} style={styles.categoryRow}>
-                <View style={styles.categoryLeft}>
-                  <Text style={styles.categoryEmoji}>{item.emoji}</Text>
-                  <View>
-                    <Text style={styles.categoryName}>{item.category}</Text>
-                    <Text style={styles.categoryMeta}>
-                      {item.count} işlem
-                    </Text>
-                  </View>
-                </View>
-                <Text style={styles.categoryAmount}>
-                  {formatCurrency(item.amount)}
-                </Text>
-              </View>
-            ))}
-          </View>
+          <Text style={styles.sectionTitle}>Kategori Dağılımı</Text>
+          {statistics.categorySpending.length > 0 ? (
+            <View style={styles.categoryList}>
+              {statistics.categorySpending.map((item) => (
+                <CategoryDistributionRow key={item.category} item={item} />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyText}>Henüz harcama yok</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -109,14 +116,30 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
 type StatCardProps = {
   label: string;
   value: string;
-  fullWidth?: boolean;
 };
 
-function StatCard({ label, value, fullWidth = false }: StatCardProps) {
+function StatCard({ label, value }: StatCardProps) {
   return (
-    <View style={[styles.statCard, fullWidth && styles.statCardFull]}>
+    <View style={styles.statCard}>
       <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statValue} numberOfLines={2}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+type CategoryDistributionRowProps = {
+  item: CategorySpending;
+};
+
+function CategoryDistributionRow({ item }: CategoryDistributionRowProps) {
+  return (
+    <View style={styles.categoryRow}>
+      <Text style={styles.categoryEmoji}>{item.emoji}</Text>
+      <Text style={styles.categoryName}>{item.category}</Text>
+      <View style={styles.dottedLine} />
+      <Text style={styles.categoryAmount}>{formatCurrency(item.amount)}</Text>
     </View>
   );
 }
@@ -132,10 +155,10 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 8,
     paddingBottom: 32,
-    gap: 24,
+    gap: 28,
   },
   header: {
-    gap: 4,
+    gap: 6,
     marginTop: 8,
   },
   title: {
@@ -148,6 +171,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: colors.textSecondary,
+    letterSpacing: 0.2,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -157,15 +181,13 @@ const styles = StyleSheet.create({
   statCard: {
     flexGrow: 1,
     flexBasis: '47%',
+    minWidth: '45%',
     backgroundColor: colors.card,
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
     gap: 8,
-  },
-  statCardFull: {
-    flexBasis: '100%',
   },
   statLabel: {
     fontSize: 13,
@@ -206,18 +228,12 @@ const styles = StyleSheet.create({
   categoryRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: colors.card,
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  categoryLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
+    gap: 10,
   },
   categoryEmoji: {
     fontSize: 24,
@@ -226,15 +242,33 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: colors.textPrimary,
+    letterSpacing: -0.2,
   },
-  categoryMeta: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
+  dottedLine: {
+    flex: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    borderStyle: 'dashed',
+    marginBottom: 2,
+    minWidth: 16,
   },
   categoryAmount: {
     fontSize: 17,
     fontWeight: '700',
     color: colors.textPrimary,
+    letterSpacing: -0.2,
+  },
+  emptyCard: {
+    backgroundColor: colors.card,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.textSecondary,
   },
 });
