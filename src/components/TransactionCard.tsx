@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../theme/colors';
 import type { TransactionCardProps } from '../types/expense';
+import { formatExpenseDate } from '../utils/date';
 import { formatCurrency } from '../utils/formatCurrency';
 
 export function TransactionCard({ expense, onPress }: TransactionCardProps) {
@@ -23,7 +24,10 @@ export function TransactionCard({ expense, onPress }: TransactionCardProps) {
         </Text>
       </View>
 
-      <Text style={styles.amount}>{formatCurrency(expense.amount)}</Text>
+      <View style={styles.amountBlock}>
+        <Text style={styles.amount}>{formatCurrency(expense.amount)}</Text>
+        <Text style={styles.date}>{formatExpenseDate(expense.createdAt)}</Text>
+      </View>
     </Pressable>
   );
 }
@@ -69,10 +73,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
   },
+  amountBlock: {
+    alignItems: 'flex-end',
+    gap: 2,
+  },
   amount: {
     fontSize: 15,
     fontWeight: '700',
     color: colors.textPrimary,
     letterSpacing: -0.2,
+  },
+  date: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.textMuted,
   },
 });

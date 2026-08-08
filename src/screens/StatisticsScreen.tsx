@@ -49,7 +49,7 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
       >
         <View style={styles.header}>
           <Text style={styles.title}>Statistics</Text>
-          <Text style={styles.subtitle}>Harcama özeti</Text>
+          <Text style={styles.subtitle}>Bu ayın harcama özeti</Text>
         </View>
 
         <View style={styles.statsGrid}>

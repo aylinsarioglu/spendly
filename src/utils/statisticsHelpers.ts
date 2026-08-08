@@ -6,6 +6,7 @@ import type {
   GroupedCategory,
   PieChartSlice,
 } from '../types/expense';
+import { isExpenseInCurrentMonth } from './date';
 import { groupExpensesByCategory } from './groupExpensesByCategory';
 
 const CHART_COLORS = [
@@ -25,20 +26,25 @@ export function getCategorySummary(expenses: Expense[]): GroupedCategory[] {
 }
 
 export function getExpenseStatistics(expenses: Expense[]): ExpenseStatistics {
-  const categorySummary = getCategorySummary(expenses);
-  const totalSpending = expenses.reduce(
+  const monthlyExpenses = expenses.filter((expense) =>
+    isExpenseInCurrentMonth(expense.createdAt),
+  );
+
+  const categorySummary = getCategorySummary(monthlyExpenses);
+  const totalSpending = monthlyExpenses.reduce(
     (total, expense) => total + expense.amount,
     0,
   );
-  const transactionCount = expenses.length;
+  const transactionCount = monthlyExpenses.length;
 
   const categorySpending: CategorySpending[] = categorySummary.map(
     (summary) => ({
       category: summary.category,
       emoji: summary.emoji,
       amount: summary.amount,
-      count: expenses.filter((expense) => expense.category === summary.category)
-        .length,
+      count: monthlyExpenses.filter(
+        (expense) => expense.category === summary.category,
+      ).length,
     }),
   );
 

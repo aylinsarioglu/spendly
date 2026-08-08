@@ -2,6 +2,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../theme/colors';
 import type { ExpenseDetailModalProps } from '../types/expense';
+import { formatExpenseDate } from '../utils/date';
 import { formatCurrency } from '../utils/formatCurrency';
 
 export function ExpenseDetailModal({
@@ -42,6 +43,10 @@ export function ExpenseDetailModal({
                   highlight
                 />
                 <DetailRow label="Note" value={note} />
+                <DetailRow
+                  label="Created"
+                  value={formatExpenseDate(expense.createdAt)}
+                />
               </View>
 
               <View style={styles.actions}>

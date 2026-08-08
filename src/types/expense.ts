@@ -6,6 +6,7 @@ export type Expense = {
   category: string;
   emoji: string;
   note: string;
+  createdAt: string;
 };
 
 export type BalanceCardProps = {

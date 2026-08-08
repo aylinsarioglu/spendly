@@ -1,9 +1,5 @@
 import type { Expense, TransactionFilter } from '../types/expense';
-
-function getExpenseTimestamp(expense: Expense): number {
-  const parsed = Number(expense.id);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
+import { getExpenseCreatedAtTime } from './date';
 
 export function filterAndSortExpenses(
   expenses: Expense[],
@@ -17,11 +13,15 @@ export function filterAndSortExpenses(
   switch (filter.sortBy) {
     case 'En Yeni':
       return filtered.sort(
-        (a, b) => getExpenseTimestamp(b) - getExpenseTimestamp(a),
+        (a, b) =>
+          getExpenseCreatedAtTime(b.createdAt) -
+          getExpenseCreatedAtTime(a.createdAt),
       );
     case 'En Eski':
       return filtered.sort(
-        (a, b) => getExpenseTimestamp(a) - getExpenseTimestamp(b),
+        (a, b) =>
+          getExpenseCreatedAtTime(a.createdAt) -
+          getExpenseCreatedAtTime(b.createdAt),
       );
     case 'En Yüksek Tutar':
       return filtered.sort((a, b) => b.amount - a.amount);

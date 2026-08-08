@@ -7,6 +7,7 @@ export const initialExpenses: Expense[] = [
     category: 'Yemek',
     emoji: '🍔',
     note: '',
+    createdAt: '2026-08-09T10:00:00.000Z',
   },
   {
     id: '2',
@@ -14,6 +15,7 @@ export const initialExpenses: Expense[] = [
     category: 'Ulaşım',
     emoji: '🚕',
     note: '',
+    createdAt: '2026-08-08T14:30:00.000Z',
   },
   {
     id: '3',
@@ -21,5 +23,6 @@ export const initialExpenses: Expense[] = [
     category: 'Alışveriş',
     emoji: '🛍️',
     note: '',
+    createdAt: '2026-08-07T09:15:00.000Z',
   },
 ];

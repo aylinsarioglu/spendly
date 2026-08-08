@@ -72,6 +72,7 @@ export function AddExpenseModal({
         category,
         emoji,
         note,
+        createdAt: editingExpense.createdAt,
       });
     } else {
       onSave({
@@ -80,6 +81,7 @@ export function AddExpenseModal({
         category,
         emoji,
         note,
+        createdAt: new Date().toISOString(),
       });
     }
 
