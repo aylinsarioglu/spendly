@@ -105,18 +105,28 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
           </View>
         </View>
 
-        <View style={styles.categorySection}>
-          <Text style={styles.sectionTitle}>Recent Transactions</Text>
-          <View style={styles.categoryList}>
-            {recentTransactions.map((expense) => (
-              <TransactionCard
-                key={expense.id}
-                expense={expense}
-                onPress={setSelectedExpense}
-              />
-            ))}
+        {expenses.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyEmoji}>📭</Text>
+            <Text style={styles.emptyTitle}>Henüz harcama yok</Text>
+            <Text style={styles.emptyDescription}>
+              İlk harcamanı eklemek için{'\n'}sağ alttaki + butonuna dokun.
+            </Text>
           </View>
-        </View>
+        ) : (
+          <View style={styles.categorySection}>
+            <Text style={styles.sectionTitle}>Recent Transactions</Text>
+            <View style={styles.categoryList}>
+              {recentTransactions.map((expense) => (
+                <TransactionCard
+                  key={expense.id}
+                  expense={expense}
+                  onPress={setSelectedExpense}
+                />
+              ))}
+            </View>
+          </View>
+        )}
       </ScrollView>
 
       <FloatingButton onPress={handleOpenCreate} />
@@ -181,4 +191,34 @@ const styles = StyleSheet.create({
   categoryList: {
     gap: 12,
   },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: 48,
+    paddingHorizontal: 28,
+    gap: 12,
+  },
+  emptyEmoji: {
+    fontSize: 56,
+    marginBottom: 4,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    letterSpacing: -0.3,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
 });
+
