@@ -5,20 +5,29 @@ import type {
 } from '../types/expense';
 
 export const filterCategoryOptions: FilterCategory[] = [
-  'Tümü',
+  'All',
   'Yemek',
   'Ulaşım',
   'Alışveriş',
 ];
 
 export const sortOptions: SortOption[] = [
-  'En Yeni',
-  'En Eski',
-  'En Yüksek Tutar',
-  'En Düşük Tutar',
+  'Newest',
+  'Oldest',
+  'Highest Amount',
+  'Lowest Amount',
 ];
 
 export const defaultTransactionFilter: TransactionFilter = {
-  category: 'Tümü',
-  sortBy: 'En Yeni',
+  category: 'All',
+  sortBy: 'Newest',
 };
+
+export function isDefaultTransactionFilter(
+  filter: TransactionFilter,
+): boolean {
+  return (
+    filter.category === defaultTransactionFilter.category &&
+    filter.sortBy === defaultTransactionFilter.sortBy
+  );
+}

@@ -8,10 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import {
-  filterCategoryOptions,
-  sortOptions,
-} from '../data/filterOptions';
+import { filterCategoryOptions, sortOptions } from '../data/filterOptions';
 import { colors } from '../theme/colors';
 import type {
   FilterBottomSheetProps,
@@ -55,14 +52,14 @@ export function FilterBottomSheet({
             contentContainerStyle={styles.content}
           >
             <View style={styles.header}>
-              <Text style={styles.title}>Filtrele</Text>
+              <Text style={styles.title}>Filter</Text>
               <Text style={styles.subtitle}>
-                İşlem listesini kategorine ve sıralamaya göre daralt
+                Narrow transactions by category and sort order
               </Text>
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Kategori</Text>
+              <Text style={styles.sectionLabel}>Category</Text>
               <View style={styles.chipRow}>
                 {filterCategoryOptions.map((category) => (
                   <OptionChip
@@ -81,7 +78,7 @@ export function FilterBottomSheet({
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Sıralama</Text>
+              <Text style={styles.sectionLabel}>Sort</Text>
               <View style={styles.chipRow}>
                 {sortOptions.map((sortBy) => (
                   <OptionChip
@@ -107,7 +104,7 @@ export function FilterBottomSheet({
                   pressed && styles.buttonPressed,
                 ]}
               >
-                <Text style={styles.cancelButtonText}>İptal</Text>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
               </Pressable>
 
               <Pressable
