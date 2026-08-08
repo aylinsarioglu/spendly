@@ -20,14 +20,14 @@ export function AddExpenseModal({
   onClose,
   onSave,
   onUpdate,
-  expense = null,
+  editingExpense = null,
 }: AddExpenseModalProps) {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState(defaultCategory);
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const isEditMode = expense !== null;
+  const isEditMode = editingExpense !== null;
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,10 +38,10 @@ export function AddExpenseModal({
       return;
     }
 
-    if (expense) {
-      setAmount(String(expense.amount));
-      setCategory(expense.category);
-      setNote(expense.note);
+    if (editingExpense) {
+      setAmount(String(editingExpense.amount));
+      setCategory(editingExpense.category);
+      setNote(editingExpense.note);
       setError(null);
       return;
     }
@@ -50,7 +50,7 @@ export function AddExpenseModal({
     setCategory(defaultCategory);
     setNote('');
     setError(null);
-  }, [isOpen, expense]);
+  }, [isOpen, editingExpense]);
 
   const handleSave = () => {
     const parsedAmount = Number(amount);
@@ -63,11 +63,11 @@ export function AddExpenseModal({
     const selectedCategory = categoryOptions.find(
       (option) => option.name === category,
     );
-    const emoji = selectedCategory?.emoji ?? expense?.emoji ?? '';
+    const emoji = selectedCategory?.emoji ?? editingExpense?.emoji ?? '';
 
-    if (expense) {
+    if (editingExpense) {
       onUpdate({
-        id: expense.id,
+        id: editingExpense.id,
         amount: parsedAmount,
         category,
         emoji,
@@ -109,12 +109,12 @@ export function AddExpenseModal({
           >
             <View style={styles.header}>
               <Text style={styles.title}>
-                {isEditMode ? 'Harcama Düzenle' : 'Harcama Ekle'}
+                {isEditMode ? 'Edit Expense' : 'Add Expense'}
               </Text>
               <Text style={styles.subtitle}>
                 {isEditMode
-                  ? 'Mevcut gideri güncelle'
-                  : 'Yeni bir gider kaydet'}
+                  ? 'Update an existing expense'
+                  : 'Save a new expense'}
               </Text>
             </View>
 
@@ -201,7 +201,7 @@ export function AddExpenseModal({
                 ]}
               >
                 <Text style={styles.saveButtonText}>
-                  {isEditMode ? 'Güncelle' : 'Kaydet'}
+                  {isEditMode ? 'Update' : 'Save'}
                 </Text>
               </Pressable>
             </View>

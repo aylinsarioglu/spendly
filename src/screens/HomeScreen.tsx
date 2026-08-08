@@ -1,6 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,18 +15,29 @@ import { AddExpenseModal } from '../components/AddExpenseModal';
 import { BalanceCard } from '../components/BalanceCard';
 import { CategoryCard } from '../components/CategoryCard';
 import { ExpenseDetailModal } from '../components/ExpenseDetailModal';
+import { FilterBottomSheet } from '../components/FilterBottomSheet';
 import { FloatingButton } from '../components/FloatingButton';
 import { TransactionCard } from '../components/TransactionCard';
+import { defaultTransactionFilter } from '../data/filterOptions';
 import { colors } from '../theme/colors';
-import type { Expense, HomeScreenProps } from '../types/expense';
+import type {
+  Expense,
+  HomeScreenProps,
+  TransactionFilter,
+} from '../types/expense';
+import { filterAndSortExpenses } from '../utils/filterExpenses';
 import { groupExpensesByCategory } from '../utils/groupExpensesByCategory';
 
 export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [appliedFilter, setAppliedFilter] = useState<TransactionFilter>(
+    defaultTransactionFilter,
+  );
 
   const total = useMemo(
     () => expenses.reduce((sum, expense) => sum + expense.amount, 0),
@@ -41,7 +54,14 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
     [expenses],
   );
 
-  const recentTransactions = useMemo(() => expenses.slice(0, 5), [expenses]);
+  const filteredTransactions = useMemo(
+    () => filterAndSortExpenses(expenses, appliedFilter),
+    [expenses, appliedFilter],
+  );
+
+  const isFilterActive =
+    appliedFilter.category !== defaultTransactionFilter.category ||
+    appliedFilter.sortBy !== defaultTransactionFilter.sortBy;
 
   const handleCloseForm = () => {
     setIsFormOpen(false);
@@ -58,9 +78,11 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
     handleCloseForm();
   };
 
-  const handleUpdateExpense = (expense: Expense) => {
+  const handleUpdateExpense = (updatedExpense: Expense) => {
     setExpenses((prev) =>
-      prev.map((item) => (item.id === expense.id ? expense : item)),
+      prev.map((exp) =>
+        exp.id === updatedExpense.id ? updatedExpense : exp,
+      ),
     );
     setIsFormOpen(false);
     setEditingExpense(null);
@@ -78,6 +100,10 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
     setSelectedExpense(null);
   };
 
+  const handleApplyFilter = (filter: TransactionFilter) => {
+    setAppliedFilter(filter);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <StatusBar style="light" />
@@ -90,8 +116,27 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.appTitle}>Spendly</Text>
-          <Text style={styles.periodLabel}>Bu Ay</Text>
+          <View style={styles.headerText}>
+            <Text style={styles.appTitle}>Spendly</Text>
+            <Text style={styles.periodLabel}>Bu Ay</Text>
+          </View>
+
+          <Pressable
+            onPress={() => setIsFilterOpen(true)}
+            style={({ pressed }) => [
+              styles.filterButton,
+              pressed && styles.filterButtonPressed,
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Filtrele"
+          >
+            <Ionicons
+              name="options-outline"
+              size={22}
+              color={isFilterActive ? colors.accent : colors.textPrimary}
+            />
+            {isFilterActive ? <View style={styles.filterDot} /> : null}
+          </Pressable>
         </View>
 
         <BalanceCard total={total} categoryCount={categoryCount} />
@@ -116,15 +161,23 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         ) : (
           <View style={styles.categorySection}>
             <Text style={styles.sectionTitle}>Recent Transactions</Text>
-            <View style={styles.categoryList}>
-              {recentTransactions.map((expense) => (
-                <TransactionCard
-                  key={expense.id}
-                  expense={expense}
-                  onPress={setSelectedExpense}
-                />
-              ))}
-            </View>
+            {filteredTransactions.length > 0 ? (
+              <View style={styles.categoryList}>
+                {filteredTransactions.map((expense) => (
+                  <TransactionCard
+                    key={expense.id}
+                    expense={expense}
+                    onPress={setSelectedExpense}
+                  />
+                ))}
+              </View>
+            ) : (
+              <View style={styles.filterEmptyState}>
+                <Text style={styles.filterEmptyText}>
+                  Bu filtreye uygun harcama yok
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </ScrollView>
@@ -133,7 +186,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
 
       <AddExpenseModal
         isOpen={isFormOpen}
-        expense={editingExpense}
+        editingExpense={editingExpense}
         onClose={handleCloseForm}
         onSave={handleAddExpense}
         onUpdate={handleUpdateExpense}
@@ -145,6 +198,13 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         onClose={() => setSelectedExpense(null)}
         onEdit={handleEditExpense}
         onDelete={handleDeleteExpense}
+      />
+
+      <FilterBottomSheet
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        value={appliedFilter}
+        onApply={handleApplyFilter}
       />
     </SafeAreaView>
   );
@@ -164,8 +224,15 @@ const styles = StyleSheet.create({
     gap: 28,
   },
   header: {
-    gap: 6,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
     marginTop: 8,
+    gap: 16,
+  },
+  headerText: {
+    flex: 1,
+    gap: 6,
   },
   appTitle: {
     fontSize: 34,
@@ -178,6 +245,28 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.textSecondary,
     letterSpacing: 0.2,
+  },
+  filterButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterButtonPressed: {
+    opacity: 0.88,
+  },
+  filterDot: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: colors.accent,
   },
   categorySection: {
     gap: 16,
@@ -220,5 +309,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
   },
+  filterEmptyState: {
+    backgroundColor: colors.card,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: 28,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  filterEmptyText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
 });
-

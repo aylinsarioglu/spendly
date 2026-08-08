@@ -46,7 +46,27 @@ export type AddExpenseModalProps = {
   onClose: () => void;
   onSave: (expense: Expense) => void;
   onUpdate: (expense: Expense) => void;
-  expense?: Expense | null;
+  editingExpense?: Expense | null;
+};
+
+export type FilterCategory = 'Tümü' | 'Yemek' | 'Ulaşım' | 'Alışveriş';
+
+export type SortOption =
+  | 'En Yeni'
+  | 'En Eski'
+  | 'En Yüksek Tutar'
+  | 'En Düşük Tutar';
+
+export type TransactionFilter = {
+  category: FilterCategory;
+  sortBy: SortOption;
+};
+
+export type FilterBottomSheetProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  value: TransactionFilter;
+  onApply: (filter: TransactionFilter) => void;
 };
 
 export type HomeScreenProps = {
