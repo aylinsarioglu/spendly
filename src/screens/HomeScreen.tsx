@@ -167,6 +167,10 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
     setAppliedFilter(filter);
   };
 
+  const handleClearFilter = () => {
+    setAppliedFilter(defaultTransactionFilter);
+  };
+
   const renderTransactionsSection = () => {
     if (expenses.length === 0) {
       return (
@@ -250,7 +254,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
               pressed && styles.filterButtonPressed,
             ]}
             accessibilityRole="button"
-            accessibilityLabel="Filter expenses"
+            accessibilityLabel="Filtrele"
           >
             <Ionicons
               name="options-outline"
@@ -304,6 +308,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         onClose={() => setIsFilterOpen(false)}
         value={appliedFilter}
         onApply={handleApplyFilter}
+        onClear={handleClearFilter}
       />
     </SafeAreaView>
   );

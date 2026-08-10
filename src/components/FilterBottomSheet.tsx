@@ -8,7 +8,11 @@ import {
   View,
 } from 'react-native';
 
-import { filterCategoryOptions, sortOptions } from '../data/filterOptions';
+import {
+  defaultTransactionFilter,
+  filterCategoryOptions,
+  sortOptions,
+} from '../data/filterOptions';
 import { colors } from '../theme/colors';
 import type {
   FilterBottomSheetProps,
@@ -20,6 +24,7 @@ export function FilterBottomSheet({
   onClose,
   value,
   onApply,
+  onClear,
 }: FilterBottomSheetProps) {
   const [draft, setDraft] = useState<TransactionFilter>(value);
 
@@ -28,6 +33,12 @@ export function FilterBottomSheet({
       setDraft(value);
     }
   }, [isOpen, value]);
+
+  const handleClear = () => {
+    setDraft(defaultTransactionFilter);
+    onClear();
+    onClose();
+  };
 
   const handleApply = () => {
     onApply(draft);
@@ -52,14 +63,14 @@ export function FilterBottomSheet({
             contentContainerStyle={styles.content}
           >
             <View style={styles.header}>
-              <Text style={styles.title}>Filter</Text>
+              <Text style={styles.title}>Filtrele</Text>
               <Text style={styles.subtitle}>
-                Narrow transactions by category and sort order
+                İşlemleri kategori ve sıralamaya göre daralt
               </Text>
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Category</Text>
+              <Text style={styles.sectionLabel}>Kategori</Text>
               <View style={styles.chipRow}>
                 {filterCategoryOptions.map((category) => (
                   <OptionChip
@@ -78,7 +89,7 @@ export function FilterBottomSheet({
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Sort</Text>
+              <Text style={styles.sectionLabel}>Sıralama</Text>
               <View style={styles.chipRow}>
                 {sortOptions.map((sortBy) => (
                   <OptionChip
@@ -98,13 +109,13 @@ export function FilterBottomSheet({
 
             <View style={styles.actions}>
               <Pressable
-                onPress={onClose}
+                onPress={handleClear}
                 style={({ pressed }) => [
-                  styles.cancelButton,
+                  styles.clearButton,
                   pressed && styles.buttonPressed,
                 ]}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.clearButtonText}>Temizle</Text>
               </Pressable>
 
               <Pressable
@@ -114,7 +125,7 @@ export function FilterBottomSheet({
                   pressed && styles.buttonPressed,
                 ]}
               >
-                <Text style={styles.applyButtonText}>Apply</Text>
+                <Text style={styles.applyButtonText}>Uygula</Text>
               </Pressable>
             </View>
           </ScrollView>
@@ -178,7 +189,7 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   header: {
-    gap: 4,
+    gap: 6,
   },
   title: {
     fontSize: 24,
@@ -224,14 +235,14 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   chipTextSelected: {
-    color: colors.textPrimary,
+    color: colors.accent,
   },
   actions: {
     flexDirection: 'row',
     gap: 12,
     marginTop: 4,
   },
-  cancelButton: {
+  clearButton: {
     flex: 1,
     borderRadius: 16,
     paddingVertical: 16,
@@ -250,7 +261,7 @@ const styles = StyleSheet.create({
   buttonPressed: {
     opacity: 0.88,
   },
-  cancelButtonText: {
+  clearButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: colors.textSecondary,

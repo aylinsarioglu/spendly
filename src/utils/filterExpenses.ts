@@ -1,29 +1,40 @@
-import type { Expense, TransactionFilter } from '../types/expense';
+import type { Expense, SortOption, TransactionFilter } from '../types/expense';
 import { getExpenseCreatedAtTime } from './date';
 import { searchExpenses } from './searchExpenses';
 
-function sortExpenses(
+export function filterExpensesByCategory(
   expenses: Expense[],
-  sortBy: TransactionFilter['sortBy'],
+  category: TransactionFilter['category'],
+): Expense[] {
+  if (category === 'Tümü') {
+    return expenses;
+  }
+
+  return expenses.filter((expense) => expense.category === category);
+}
+
+export function sortExpensesByOption(
+  expenses: Expense[],
+  sortBy: SortOption,
 ): Expense[] {
   const sorted = [...expenses];
 
   switch (sortBy) {
-    case 'Newest':
+    case 'En Yeni':
       return sorted.sort(
         (a, b) =>
           getExpenseCreatedAtTime(b.createdAt) -
           getExpenseCreatedAtTime(a.createdAt),
       );
-    case 'Oldest':
+    case 'En Eski':
       return sorted.sort(
         (a, b) =>
           getExpenseCreatedAtTime(a.createdAt) -
           getExpenseCreatedAtTime(b.createdAt),
       );
-    case 'Highest Amount':
+    case 'En Yüksek Tutar':
       return sorted.sort((a, b) => b.amount - a.amount);
-    case 'Lowest Amount':
+    case 'En Düşük Tutar':
       return sorted.sort((a, b) => a.amount - b.amount);
     default:
       return sorted;
@@ -34,12 +45,8 @@ export function filterAndSortExpenses(
   expenses: Expense[],
   filter: TransactionFilter,
 ): Expense[] {
-  const filtered =
-    filter.category === 'All'
-      ? expenses
-      : expenses.filter((expense) => expense.category === filter.category);
-
-  return sortExpenses(filtered, filter.sortBy);
+  const filtered = filterExpensesByCategory(expenses, filter.category);
+  return sortExpensesByOption(filtered, filter.sortBy);
 }
 
 export function getVisibleTransactions(
