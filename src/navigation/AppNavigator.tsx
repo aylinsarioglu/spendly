@@ -2,14 +2,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet } from 'react-native';
 
+import { useAppSettings } from '../context/AppSettingsContext';
+import { useThemedStyles } from '../hooks/useThemedStyles';
 import { HomeScreen } from '../screens/HomeScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
 import { StatisticsScreen } from '../screens/StatisticsScreen';
-import { colors } from '../theme/colors';
+import type { ThemeColors } from '../theme/colors';
 import type { AppNavigatorProps, RootTabParamList } from '../types/expense';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-export function AppNavigator({ expenses, setExpenses }: AppNavigatorProps) {
+export function AppNavigator({
+  expenses,
+  setExpenses,
+  onDeleteAllExpenses,
+}: AppNavigatorProps) {
+  const { colors } = useAppSettings();
+  const styles = useThemedStyles(createStyles);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -43,21 +53,35 @@ export function AppNavigator({ expenses, setExpenses }: AppNavigatorProps) {
       >
         {() => <StatisticsScreen expenses={expenses} />}
       </Tab.Screen>
+
+      <Tab.Screen
+        name="Settings"
+        options={{
+          tabBarLabel: 'Settings',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+        }}
+      >
+        {() => <SettingsScreen onDeleteAllExpenses={onDeleteAllExpenses} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: colors.card,
-    borderTopColor: colors.border,
-    borderTopWidth: 1,
-    height: 64,
-    paddingTop: 8,
-    paddingBottom: 10,
-  },
-  tabBarLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    tabBar: {
+      backgroundColor: colors.card,
+      borderTopColor: colors.border,
+      borderTopWidth: 1,
+      height: 64,
+      paddingTop: 8,
+      paddingBottom: 10,
+    },
+    tabBarLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+    },
+  });
+}

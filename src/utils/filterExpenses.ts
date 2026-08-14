@@ -1,5 +1,9 @@
 import type { Expense, SortOption, TransactionFilter } from '../types/expense';
-import { getExpenseCreatedAtTime } from './date';
+import {
+  getExpenseCreatedAtTime,
+  getSafeCreatedAt,
+  matchesDateFilter,
+} from './date';
 import { searchExpenses } from './searchExpenses';
 
 export function filterExpensesByCategory(
@@ -13,6 +17,19 @@ export function filterExpensesByCategory(
   return expenses.filter((expense) => expense.category === category);
 }
 
+export function filterExpensesByDate(
+  expenses: Expense[],
+  dateFilter: TransactionFilter['date'],
+): Expense[] {
+  if (dateFilter === 'Tümü') {
+    return expenses;
+  }
+
+  return expenses.filter((expense) =>
+    matchesDateFilter(getSafeCreatedAt(expense), dateFilter),
+  );
+}
+
 export function sortExpensesByOption(
   expenses: Expense[],
   sortBy: SortOption,
@@ -23,14 +40,14 @@ export function sortExpensesByOption(
     case 'En Yeni':
       return sorted.sort(
         (a, b) =>
-          getExpenseCreatedAtTime(b.createdAt) -
-          getExpenseCreatedAtTime(a.createdAt),
+          getExpenseCreatedAtTime(getSafeCreatedAt(b)) -
+          getExpenseCreatedAtTime(getSafeCreatedAt(a)),
       );
     case 'En Eski':
       return sorted.sort(
         (a, b) =>
-          getExpenseCreatedAtTime(a.createdAt) -
-          getExpenseCreatedAtTime(b.createdAt),
+          getExpenseCreatedAtTime(getSafeCreatedAt(a)) -
+          getExpenseCreatedAtTime(getSafeCreatedAt(b)),
       );
     case 'En Yüksek Tutar':
       return sorted.sort((a, b) => b.amount - a.amount);
@@ -45,8 +62,9 @@ export function filterAndSortExpenses(
   expenses: Expense[],
   filter: TransactionFilter,
 ): Expense[] {
-  const filtered = filterExpensesByCategory(expenses, filter.category);
-  return sortExpensesByOption(filtered, filter.sortBy);
+  const byCategory = filterExpensesByCategory(expenses, filter.category);
+  const byDate = filterExpensesByDate(byCategory, filter.date);
+  return sortExpensesByOption(byDate, filter.sortBy);
 }
 
 export function getVisibleTransactions(

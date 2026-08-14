@@ -19,11 +19,13 @@ import { FilterBottomSheet } from '../components/FilterBottomSheet';
 import { FloatingButton } from '../components/FloatingButton';
 import { SearchBar } from '../components/SearchBar';
 import { TransactionCard } from '../components/TransactionCard';
+import { useAppSettings } from '../context/AppSettingsContext';
 import {
   defaultTransactionFilter,
-  isDefaultTransactionFilter,
+  getActiveFilterCount,
 } from '../data/filterOptions';
-import { colors } from '../theme/colors';
+import { useThemedStyles } from '../hooks/useThemedStyles';
+import type { ThemeColors } from '../theme/colors';
 import type {
   Expense,
   HomeScreenProps,
@@ -35,6 +37,8 @@ import { groupExpensesByCategory } from '../utils/groupExpensesByCategory';
 const UNDO_TIMEOUT_MS = 5000;
 
 export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
+  const { colors, theme } = useAppSettings();
+  const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -71,7 +75,8 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
     [expenses, appliedFilter, searchQuery],
   );
 
-  const isFilterActive = !isDefaultTransactionFilter(appliedFilter);
+  const activeFilterCount = getActiveFilterCount(appliedFilter);
+  const isFilterActive = activeFilterCount > 0;
 
   const clearUndoTimeout = () => {
     if (undoTimeoutRef.current !== null) {
@@ -104,7 +109,15 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
   const handleUpdateExpense = (updatedExpense: Expense) => {
     setExpenses((prev) =>
       prev.map((exp) =>
-        exp.id === updatedExpense.id ? updatedExpense : exp,
+        exp.id === updatedExpense.id
+          ? {
+              ...exp,
+              amount: updatedExpense.amount,
+              category: updatedExpense.category,
+              emoji: updatedExpense.emoji,
+              note: updatedExpense.note,
+            }
+          : exp,
       ),
     );
     setIsFormOpen(false);
@@ -215,7 +228,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <StatusBar style="light" />
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -261,7 +274,11 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
               size={20}
               color={isFilterActive ? colors.accent : colors.textPrimary}
             />
-            {isFilterActive ? <View style={styles.filterDot} /> : null}
+            {activeFilterCount > 0 ? (
+              <View style={styles.filterBadge}>
+                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+              </View>
+            ) : null}
           </Pressable>
         </View>
 
@@ -314,7 +331,8 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
@@ -368,14 +386,22 @@ const styles = StyleSheet.create({
   filterButtonPressed: {
     opacity: 0.88,
   },
-  filterDot: {
+  filterBadge: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 7,
-    height: 7,
-    borderRadius: 4,
+    top: 4,
+    right: 4,
+    minWidth: 16,
+    height: 16,
+    paddingHorizontal: 4,
+    borderRadius: 8,
     backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#F5F5F7',
   },
   categorySection: {
     gap: 16,
@@ -458,4 +484,5 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     color: colors.accent,
   },
-});
+  });
+}

@@ -1,9 +1,10 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors } from '../theme/colors';
+import { useAppSettings } from '../context/AppSettingsContext';
+import { useThemedStyles } from '../hooks/useThemedStyles';
+import type { ThemeColors } from '../theme/colors';
 import type { ExpenseDetailModalProps } from '../types/expense';
-import { formatExpenseDate } from '../utils/date';
-import { formatCurrency } from '../utils/formatCurrency';
+import { formatExpenseFullDate, getSafeCreatedAt } from '../utils/date';
 
 export function ExpenseDetailModal({
   visible,
@@ -12,6 +13,8 @@ export function ExpenseDetailModal({
   onEdit,
   onDelete,
 }: ExpenseDetailModalProps) {
+  const { formatMoney } = useAppSettings();
+  const styles = useThemedStyles(createStyles);
   const note = expense?.note.trim() || 'No note';
 
   return (
@@ -39,13 +42,13 @@ export function ExpenseDetailModal({
                 <DetailRow label="Category" value={expense.category} />
                 <DetailRow
                   label="Amount"
-                  value={formatCurrency(expense.amount)}
+                  value={formatMoney(expense.amount)}
                   highlight
                 />
                 <DetailRow label="Note" value={note} />
                 <DetailRow
-                  label="Created"
-                  value={formatExpenseDate(expense.createdAt)}
+                  label="Tarih"
+                  value={formatExpenseFullDate(getSafeCreatedAt(expense))}
                 />
               </View>
 
@@ -95,6 +98,7 @@ type DetailRowProps = {
 };
 
 function DetailRow({ label, value, highlight = false }: DetailRowProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{label}</Text>
@@ -105,7 +109,8 @@ function DetailRow({ label, value, highlight = false }: DetailRowProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -230,4 +235,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.danger,
   },
-});
+  });
+}

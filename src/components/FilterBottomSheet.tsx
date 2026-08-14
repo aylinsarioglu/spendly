@@ -9,11 +9,13 @@ import {
 } from 'react-native';
 
 import {
+  dateFilterOptions,
   defaultTransactionFilter,
   filterCategoryOptions,
   sortOptions,
 } from '../data/filterOptions';
-import { colors } from '../theme/colors';
+import { useThemedStyles } from '../hooks/useThemedStyles';
+import type { ThemeColors } from '../theme/colors';
 import type {
   FilterBottomSheetProps,
   TransactionFilter,
@@ -27,6 +29,7 @@ export function FilterBottomSheet({
   onClear,
 }: FilterBottomSheetProps) {
   const [draft, setDraft] = useState<TransactionFilter>(value);
+  const styles = useThemedStyles(createStyles);
 
   useEffect(() => {
     if (isOpen) {
@@ -65,7 +68,7 @@ export function FilterBottomSheet({
             <View style={styles.header}>
               <Text style={styles.title}>Filtrele</Text>
               <Text style={styles.subtitle}>
-                İşlemleri kategori ve sıralamaya göre daralt
+                İşlemleri kategori, tarih ve sıralamaya göre daralt
               </Text>
             </View>
 
@@ -81,6 +84,25 @@ export function FilterBottomSheet({
                       setDraft((prev) => ({
                         ...prev,
                         category,
+                      }))
+                    }
+                  />
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Tarih</Text>
+              <View style={styles.chipRow}>
+                {dateFilterOptions.map((date) => (
+                  <OptionChip
+                    key={date}
+                    label={date}
+                    selected={draft.date === date}
+                    onPress={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        date,
                       }))
                     }
                   />
@@ -142,6 +164,7 @@ type OptionChipProps = {
 };
 
 function OptionChip({ label, selected, onPress }: OptionChipProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -154,7 +177,8 @@ function OptionChip({ label, selected, onPress }: OptionChipProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -269,6 +293,7 @@ const styles = StyleSheet.create({
   applyButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: '#F5F5F7',
   },
-});
+  });
+}

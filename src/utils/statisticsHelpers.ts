@@ -1,4 +1,3 @@
-import { colors } from '../theme/colors';
 import type {
   CategorySpending,
   Expense,
@@ -6,11 +5,11 @@ import type {
   GroupedCategory,
   PieChartSlice,
 } from '../types/expense';
-import { isExpenseInCurrentMonth } from './date';
+import { getExpensesInCurrentMonth } from './date';
 import { groupExpensesByCategory } from './groupExpensesByCategory';
 
 const CHART_COLORS = [
-  colors.accent,
+  '#6C5CE7',
   '#A29BFE',
   '#FD79A8',
   '#FDCB6E',
@@ -26,9 +25,7 @@ export function getCategorySummary(expenses: Expense[]): GroupedCategory[] {
 }
 
 export function getExpenseStatistics(expenses: Expense[]): ExpenseStatistics {
-  const monthlyExpenses = expenses.filter((expense) =>
-    isExpenseInCurrentMonth(expense.createdAt),
-  );
+  const monthlyExpenses = getExpensesInCurrentMonth(expenses);
 
   const categorySummary = getCategorySummary(monthlyExpenses);
   const totalSpending = monthlyExpenses.reduce(
@@ -66,6 +63,7 @@ export function getExpenseStatistics(expenses: Expense[]): ExpenseStatistics {
 
 export function getPieChartData(
   categorySummary: GroupedCategory[],
+  legendFontColor: string,
 ): PieChartSlice[] {
   return categorySummary
     .filter((item) => item.amount > 0)
@@ -73,7 +71,7 @@ export function getPieChartData(
       name: item.category,
       population: item.amount,
       color: CHART_COLORS[index % CHART_COLORS.length],
-      legendFontColor: colors.textPrimary,
+      legendFontColor,
       legendFontSize: 12,
     }));
 }

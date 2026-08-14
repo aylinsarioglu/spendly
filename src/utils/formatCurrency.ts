@@ -1,3 +1,1 @@
-export function formatCurrency(amount: number): string {
-  return `₺${amount.toLocaleString('tr-TR')}`;
-}
+export { formatCurrency, getCurrencySymbol } from './currency';

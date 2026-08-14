@@ -9,15 +9,18 @@ import {
 import { PieChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors } from '../theme/colors';
+import { useAppSettings } from '../context/AppSettingsContext';
+import { useThemedStyles } from '../hooks/useThemedStyles';
+import type { ThemeColors } from '../theme/colors';
 import type { CategorySpending, StatisticsScreenProps } from '../types/expense';
-import { formatCurrency } from '../utils/formatCurrency';
 import {
   getExpenseStatistics,
   getPieChartData,
 } from '../utils/statisticsHelpers';
 
 export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
+  const { colors, formatMoney } = useAppSettings();
+  const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
   const chartWidth = width - horizontalPadding * 2 - 32;
@@ -28,8 +31,8 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
   );
 
   const pieChartData = useMemo(
-    () => getPieChartData(statistics.categorySummary),
-    [statistics.categorySummary],
+    () => getPieChartData(statistics.categorySummary, colors.textPrimary),
+    [statistics.categorySummary, colors.textPrimary],
   );
 
   const highestCategoryLabel =
@@ -55,7 +58,7 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
         <View style={styles.statsGrid}>
           <StatCard
             label="Toplam Harcama"
-            value={formatCurrency(statistics.totalSpending)}
+            value={formatMoney(statistics.totalSpending)}
           />
           <StatCard
             label="Toplam İşlem"
@@ -63,7 +66,7 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
           />
           <StatCard
             label="Ortalama Harcama"
-            value={formatCurrency(statistics.averageSpending)}
+            value={formatMoney(statistics.averageSpending)}
           />
           <StatCard
             label="En Çok Harcama Yapılan Kategori"
@@ -119,6 +122,7 @@ type StatCardProps = {
 };
 
 function StatCard({ label, value }: StatCardProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.statCard}>
       <Text style={styles.statLabel}>{label}</Text>
@@ -134,17 +138,20 @@ type CategoryDistributionRowProps = {
 };
 
 function CategoryDistributionRow({ item }: CategoryDistributionRowProps) {
+  const { formatMoney } = useAppSettings();
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.categoryRow}>
       <Text style={styles.categoryEmoji}>{item.emoji}</Text>
       <Text style={styles.categoryName}>{item.category}</Text>
       <View style={styles.dottedLine} />
-      <Text style={styles.categoryAmount}>{formatCurrency(item.amount)}</Text>
+      <Text style={styles.categoryAmount}>{formatMoney(item.amount)}</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
@@ -271,4 +278,5 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.textSecondary,
   },
-});
+  });
+}

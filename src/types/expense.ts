@@ -52,6 +52,13 @@ export type AddExpenseModalProps = {
 
 export type FilterCategory = 'Tümü' | 'Yemek' | 'Ulaşım' | 'Alışveriş';
 
+export type DateFilterOption =
+  | 'Tümü'
+  | 'Bugün'
+  | 'Dün'
+  | 'Bu Hafta'
+  | 'Bu Ay';
+
 export type SortOption =
   | 'En Yeni'
   | 'En Eski'
@@ -60,6 +67,7 @@ export type SortOption =
 
 export type TransactionFilter = {
   category: FilterCategory;
+  date: DateFilterOption;
   sortBy: SortOption;
 };
 
@@ -110,12 +118,18 @@ export type PieChartSlice = {
   legendFontSize: number;
 };
 
+export type SettingsScreenProps = {
+  onDeleteAllExpenses: () => void;
+};
+
 export type AppNavigatorProps = {
   expenses: Expense[];
   setExpenses: Dispatch<SetStateAction<Expense[]>>;
+  onDeleteAllExpenses: () => void;
 };
 
 export type RootTabParamList = {
   Home: undefined;
   Statistics: undefined;
+  Settings: undefined;
 };

@@ -12,8 +12,11 @@ import {
 } from 'react-native';
 
 import { categoryOptions, defaultCategory } from '../data/categoryOptions';
-import { colors } from '../theme/colors';
+import { useAppSettings } from '../context/AppSettingsContext';
+import { useThemedStyles } from '../hooks/useThemedStyles';
+import type { ThemeColors } from '../theme/colors';
 import type { AddExpenseModalProps } from '../types/expense';
+import { getCurrencySymbol } from '../utils/currency';
 
 export function AddExpenseModal({
   isOpen,
@@ -22,6 +25,8 @@ export function AddExpenseModal({
   onUpdate,
   editingExpense = null,
 }: AddExpenseModalProps) {
+  const { colors, currency } = useAppSettings();
+  const styles = useThemedStyles(createStyles);
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState(defaultCategory);
   const [note, setNote] = useState('');
@@ -123,7 +128,7 @@ export function AddExpenseModal({
             <View style={styles.field}>
               <Text style={styles.label}>Tutar</Text>
               <View style={styles.amountInputWrapper}>
-                <Text style={styles.currency}>₺</Text>
+                <Text style={styles.currency}>{getCurrencySymbol(currency)}</Text>
                 <TextInput
                   style={styles.amountInput}
                   value={amount}
@@ -214,7 +219,8 @@ export function AddExpenseModal({
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -375,6 +381,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: '#F5F5F7',
   },
-});
+  });
+}

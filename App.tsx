@@ -1,28 +1,28 @@
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppSettingsProvider, useAppSettings } from './src/context/AppSettingsContext';
 import { initialExpenses } from './src/data/mockData';
 import { AppNavigator } from './src/navigation/AppNavigator';
-import { colors } from './src/theme/colors';
+import type { ThemeColors } from './src/theme/colors';
 import type { Expense } from './src/types/expense';
-import { loadExpenses, saveExpenses } from './src/utils/storage';
-
-const navigationTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: colors.background,
-    card: colors.card,
-    border: colors.border,
-    primary: colors.accent,
-    text: colors.textPrimary,
-  },
-};
+import { clearExpenses, loadExpenses, saveExpenses } from './src/utils/storage';
 
 export default function App() {
+  return (
+    <SafeAreaProvider>
+      <AppSettingsProvider>
+        <AppContent />
+      </AppSettingsProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function AppContent() {
+  const { ready, colors, theme } = useAppSettings();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,37 +55,62 @@ export default function App() {
     });
   }, [expenses, loading]);
 
-  if (loading) {
+  const handleDeleteAllExpenses = () => {
+    setExpenses([]);
+    clearExpenses().catch((error) => {
+      console.error('Failed to clear expenses:', error);
+    });
+  };
+
+  const navigationTheme = {
+    ...(theme === 'dark' ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(theme === 'dark' ? DarkTheme.colors : DefaultTheme.colors),
+      background: colors.background,
+      card: colors.card,
+      border: colors.border,
+      primary: colors.accent,
+      text: colors.textPrimary,
+    },
+  };
+
+  if (!ready || loading) {
     return (
-      <SafeAreaProvider>
-        <StatusBar style="light" />
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
+      <>
+        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+        <View style={createLoadingStyles(colors).loadingContainer}>
+          <Text style={createLoadingStyles(colors).loadingText}>Loading...</Text>
         </View>
-      </SafeAreaProvider>
+      </>
     );
   }
 
   return (
-    <SafeAreaProvider>
-      <StatusBar style="light" />
+    <>
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       <NavigationContainer theme={navigationTheme}>
-        <AppNavigator expenses={expenses} setExpenses={setExpenses} />
+        <AppNavigator
+          expenses={expenses}
+          setExpenses={setExpenses}
+          onDeleteAllExpenses={handleDeleteAllExpenses}
+        />
       </NavigationContainer>
-    </SafeAreaProvider>
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background,
-  },
-  loadingText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.textSecondary,
-  },
-});
+function createLoadingStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    loadingContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background,
+    },
+    loadingText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+  });
+}
