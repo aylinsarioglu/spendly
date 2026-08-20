@@ -5,25 +5,43 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AboutSheet } from '../components/AboutSheet';
 import { ConfirmSheet } from '../components/ConfirmSheet';
+import { MessageSheet } from '../components/MessageSheet';
 import { OptionPickerSheet } from '../components/OptionPickerSheet';
 import { SettingsRow } from '../components/SettingsRow';
 import { APP_VERSION } from '../constants/app';
 import { useAppSettings } from '../context/AppSettingsContext';
-import { currencyOptions } from '../utils/currency';
 import { themeOptions } from '../data/settingsOptions';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
 import type { SettingsScreenProps } from '../types/expense';
 import type { CurrencyCode, ThemeMode } from '../types/settings';
+import { currencyOptions } from '../utils/currency';
+import { exportExpenses } from '../utils/exportExpenses';
 
 type Picker = 'none' | 'currency' | 'theme' | 'about';
 type DeleteStep = 'none' | 'first' | 'second';
 
-export function SettingsScreen({ onDeleteAllExpenses }: SettingsScreenProps) {
+function isShareCancelled(error: unknown): boolean {
+  const message =
+    error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+  return message.includes('cancel') || message.includes('dismiss');
+}
+
+type Feedback = {
+  title: string;
+  message: string;
+} | null;
+
+export function SettingsScreen({
+  expenses,
+  onDeleteAllExpenses,
+}: SettingsScreenProps) {
   const styles = useThemedStyles(createStyles);
   const { currency, theme, setCurrency, setTheme } = useAppSettings();
   const [picker, setPicker] = useState<Picker>('none');
   const [deleteStep, setDeleteStep] = useState<DeleteStep>('none');
+  const [feedback, setFeedback] = useState<Feedback>(null);
 
   const currencyLabel =
     currencyOptions.find((option) => option.code === currency)?.label ?? currency;
@@ -33,6 +51,33 @@ export function SettingsScreen({ onDeleteAllExpenses }: SettingsScreenProps) {
   const handleDeleteAll = () => {
     onDeleteAllExpenses();
     setDeleteStep('none');
+  };
+
+  const handleExportExpenses = async () => {
+    if (expenses.length === 0) {
+      setFeedback({
+        title: 'Export',
+        message: 'Export edilecek harcama bulunmuyor.',
+      });
+      return;
+    }
+
+    try {
+      await exportExpenses(expenses, currency);
+      setFeedback({
+        title: 'Export',
+        message: 'Expenses exported successfully',
+      });
+    } catch (error) {
+      if (isShareCancelled(error)) {
+        return;
+      }
+
+      setFeedback({
+        title: 'Export',
+        message: 'Could not export expenses',
+      });
+    }
   };
 
   return (
@@ -68,6 +113,14 @@ export function SettingsScreen({ onDeleteAllExpenses }: SettingsScreenProps) {
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Data</Text>
+          <SettingsRow
+            icon="download-outline"
+            title="Export Expenses"
+            description="Download all expenses as a CSV file"
+            onPress={() => {
+              void handleExportExpenses();
+            }}
+          />
           <SettingsRow
             icon="trash-outline"
             title="Delete All Expenses"
@@ -139,6 +192,13 @@ export function SettingsScreen({ onDeleteAllExpenses }: SettingsScreenProps) {
       <AboutSheet
         isOpen={picker === 'about'}
         onClose={() => setPicker('none')}
+      />
+
+      <MessageSheet
+        isOpen={feedback !== null}
+        title={feedback?.title ?? ''}
+        message={feedback?.message ?? ''}
+        onClose={() => setFeedback(null)}
       />
     </SafeAreaView>
   );

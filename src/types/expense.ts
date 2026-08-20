@@ -119,6 +119,7 @@ export type PieChartSlice = {
 };
 
 export type SettingsScreenProps = {
+  expenses: Expense[];
   onDeleteAllExpenses: () => void;
 };
 

@@ -1,25 +1,51 @@
 {
   "expo": {
-    "name": "spendly",
+    "name": "Spendly",
     "slug": "spendly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0C"
+    },
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "icon": "./assets/icon.png",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundImage": "./assets/adaptive-icon-background.png",
+        "backgroundColor": "#0A0A0C"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#0A0A0C"
+      }
+    },
+    "plugins": [
+      "expo-sharing",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0A0A0C",
+          "image": "./assets/splash.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "dark": {
+            "backgroundColor": "#0A0A0C",
+            "image": "./assets/splash.png"
+          }
+        }
+      ]
+    ]
   }
 }

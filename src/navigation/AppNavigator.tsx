@@ -63,7 +63,12 @@ export function AppNavigator({
           ),
         }}
       >
-        {() => <SettingsScreen onDeleteAllExpenses={onDeleteAllExpenses} />}
+        {() => (
+          <SettingsScreen
+            expenses={expenses}
+            onDeleteAllExpenses={onDeleteAllExpenses}
+          />
+        )}
       </Tab.Screen>
     </Tab.Navigator>
   );
