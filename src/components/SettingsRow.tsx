@@ -11,6 +11,7 @@ type SettingsRowProps = {
   description: string;
   value?: string;
   destructive?: boolean;
+  showDivider?: boolean;
   onPress?: () => void;
 };
 
@@ -20,6 +21,7 @@ export function SettingsRow({
   description,
   value,
   destructive = false,
+  showDivider = false,
   onPress,
 }: SettingsRowProps) {
   const { colors } = useAppSettings();
@@ -30,10 +32,14 @@ export function SettingsRow({
     <Pressable
       onPress={onPress}
       disabled={!onPress}
-      style={({ pressed }) => [styles.row, pressed && onPress && styles.pressed]}
+      style={({ pressed }) => [
+        styles.row,
+        showDivider && styles.rowDivider,
+        pressed && onPress && styles.pressed,
+      ]}
     >
       <View style={[styles.iconWrap, destructive && styles.iconWrapDanger]}>
-        <Ionicons name={icon} size={20} color={iconColor} />
+        <Ionicons name={icon} size={22} color={iconColor} />
       </View>
 
       <View style={styles.content}>
@@ -43,15 +49,16 @@ export function SettingsRow({
         <Text style={styles.description}>{description}</Text>
       </View>
 
-      {value ? <Text style={styles.value}>{value}</Text> : null}
-
-      {onPress ? (
-        <Ionicons
-          name="chevron-forward"
-          size={18}
-          color={destructive ? colors.danger : colors.textMuted}
-        />
-      ) : null}
+      <View style={styles.trailing}>
+        {value ? <Text style={styles.value}>{value}</Text> : null}
+        {onPress ? (
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={destructive ? colors.danger : colors.textMuted}
+          />
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -61,21 +68,23 @@ function createStyles(colors: ThemeColors) {
     row: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
-      backgroundColor: colors.card,
-      borderRadius: 18,
-      padding: 16,
-      borderWidth: 1,
-      borderColor: colors.border,
+      gap: 14,
+      paddingHorizontal: 18,
+      paddingVertical: 16,
+    },
+    rowDivider: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
     },
     pressed: {
       opacity: 0.88,
+      backgroundColor: colors.cardElevated,
     },
     iconWrap: {
-      width: 40,
-      height: 40,
-      borderRadius: 12,
-      backgroundColor: colors.accentSoft,
+      width: 48,
+      height: 48,
+      borderRadius: 14,
+      backgroundColor: colors.cardElevated,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -84,12 +93,13 @@ function createStyles(colors: ThemeColors) {
     },
     content: {
       flex: 1,
-      gap: 2,
+      gap: 3,
     },
     title: {
-      fontSize: 16,
+      fontSize: 17,
       fontWeight: '600',
       color: colors.textPrimary,
+      letterSpacing: -0.2,
     },
     titleDanger: {
       color: colors.danger,
@@ -98,6 +108,12 @@ function createStyles(colors: ThemeColors) {
       fontSize: 13,
       fontWeight: '500',
       color: colors.textSecondary,
+      lineHeight: 18,
+    },
+    trailing: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
     },
     value: {
       fontSize: 14,

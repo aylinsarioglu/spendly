@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { APP_NAME, APP_TAGLINE, APP_VERSION } from '../constants/app';
+import { APP_NAME, APP_VERSION } from '../constants/app';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
 
@@ -25,14 +25,14 @@ export function AboutSheet({ isOpen, onClose }: AboutSheetProps) {
         <View style={styles.sheet}>
           <View style={styles.handle} />
           <Text style={styles.title}>{APP_NAME}</Text>
-          <Text style={styles.tagline}>{APP_TAGLINE}</Text>
-          <Text style={styles.version}>Version {APP_VERSION}</Text>
+          <Text style={styles.tagline}>Kişisel harcama takip uygulaması</Text>
+          <Text style={styles.version}>Sürüm {APP_VERSION}</Text>
 
           <Pressable
             onPress={onClose}
             style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}
           >
-            <Text style={styles.closeText}>Close</Text>
+            <Text style={styles.closeText}>Kapat</Text>
           </Pressable>
         </View>
       </View>

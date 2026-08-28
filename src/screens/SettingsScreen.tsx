@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AboutSheet } from '../components/AboutSheet';
@@ -38,10 +38,14 @@ export function SettingsScreen({
   onDeleteAllExpenses,
 }: SettingsScreenProps) {
   const styles = useThemedStyles(createStyles);
+  const { width } = useWindowDimensions();
   const { currency, theme, setCurrency, setTheme } = useAppSettings();
   const [picker, setPicker] = useState<Picker>('none');
   const [deleteStep, setDeleteStep] = useState<DeleteStep>('none');
   const [feedback, setFeedback] = useState<Feedback>(null);
+
+  const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
+  const contentWidth = Math.min(width - horizontalPadding * 2, 560);
 
   const currencyLabel =
     currencyOptions.find((option) => option.code === currency)?.label ?? currency;
@@ -56,8 +60,8 @@ export function SettingsScreen({
   const handleExportExpenses = async () => {
     if (expenses.length === 0) {
       setFeedback({
-        title: 'Export',
-        message: 'Export edilecek harcama bulunmuyor.',
+        title: 'Dışa Aktarma',
+        message: 'Dışa aktarılacak harcama bulunmuyor.',
       });
       return;
     }
@@ -65,8 +69,8 @@ export function SettingsScreen({
     try {
       await exportExpenses(expenses, currency);
       setFeedback({
-        title: 'Export',
-        message: 'Expenses exported successfully',
+        title: 'Dışa Aktarma',
+        message: 'Harcamalar başarıyla dışa aktarıldı.',
       });
     } catch (error) {
       if (isShareCancelled(error)) {
@@ -74,8 +78,8 @@ export function SettingsScreen({
       }
 
       setFeedback({
-        title: 'Export',
-        message: 'Could not export expenses',
+        title: 'Dışa Aktarma',
+        message: 'Harcamalar dışa aktarılamadı.',
       });
     }
   };
@@ -85,71 +89,88 @@ export function SettingsScreen({
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingHorizontal: horizontalPadding,
+            alignItems: 'center',
+          },
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Settings</Text>
-          <Text style={styles.subtitle}>Preferences and data</Text>
-        </View>
+        <View style={[styles.content, { width: contentWidth }]}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Ayarlar</Text>
+            <Text style={styles.subtitle}>Tercihler ve uygulama verileri</Text>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>General</Text>
-          <SettingsRow
-            icon="cash-outline"
-            title="Currency"
-            description="Used across Home and Statistics"
-            value={currencyLabel}
-            onPress={() => setPicker('currency')}
-          />
-          <SettingsRow
-            icon="moon-outline"
-            title="Theme"
-            description="Dark is the default Spendly look"
-            value={themeLabel}
-            onPress={() => setPicker('theme')}
-          />
-        </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>GENEL</Text>
+            <View style={styles.sectionCard}>
+              <SettingsRow
+                icon="cash-outline"
+                title="Para Birimi"
+                description="Ana Sayfa ve İstatistikler'de kullanılır"
+                value={currencyLabel}
+                showDivider
+                onPress={() => setPicker('currency')}
+              />
+              <SettingsRow
+                icon="moon-outline"
+                title="Tema"
+                description="Spendly görünümünü değiştir"
+                value={themeLabel}
+                onPress={() => setPicker('theme')}
+              />
+            </View>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Data</Text>
-          <SettingsRow
-            icon="download-outline"
-            title="Export Expenses"
-            description="Download all expenses as a CSV file"
-            onPress={() => {
-              void handleExportExpenses();
-            }}
-          />
-          <SettingsRow
-            icon="trash-outline"
-            title="Delete All Expenses"
-            description="Permanently remove every saved expense"
-            destructive
-            onPress={() => setDeleteStep('first')}
-          />
-        </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>VERİLER</Text>
+            <View style={styles.sectionCard}>
+              <SettingsRow
+                icon="download-outline"
+                title="Harcamaları Dışa Aktar"
+                description="Tüm harcamaları CSV olarak dışa aktar"
+                showDivider
+                onPress={() => {
+                  void handleExportExpenses();
+                }}
+              />
+              <SettingsRow
+                icon="trash-outline"
+                title="Tüm Harcamaları Sil"
+                description="Kaydedilen tüm harcamaları kalıcı olarak sil"
+                destructive
+                onPress={() => setDeleteStep('first')}
+              />
+            </View>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>About</Text>
-          <SettingsRow
-            icon="information-circle-outline"
-            title="App Version"
-            description="Current Spendly build"
-            value={APP_VERSION}
-          />
-          <SettingsRow
-            icon="sparkles-outline"
-            title="About Spendly"
-            description="Personal expense tracker"
-            onPress={() => setPicker('about')}
-          />
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>HAKKINDA</Text>
+            <View style={styles.sectionCard}>
+              <SettingsRow
+                icon="information-circle-outline"
+                title="Uygulama Sürümü"
+                description="Mevcut Spendly sürümü"
+                value={APP_VERSION}
+                showDivider
+              />
+              <SettingsRow
+                icon="sparkles-outline"
+                title="Spendly Hakkında"
+                description="Kişisel harcama takip uygulaması"
+                onPress={() => setPicker('about')}
+              />
+            </View>
+          </View>
         </View>
       </ScrollView>
 
       <OptionPickerSheet
         isOpen={picker === 'currency'}
-        title="Currency"
+        title="Para Birimi"
         options={currencyOptions.map((option) => ({
           value: option.code,
           label: option.label,
@@ -161,7 +182,7 @@ export function SettingsScreen({
 
       <OptionPickerSheet
         isOpen={picker === 'theme'}
-        title="Theme"
+        title="Tema"
         options={themeOptions.map((option) => ({
           value: option.value,
           label: option.label,
@@ -173,18 +194,20 @@ export function SettingsScreen({
 
       <ConfirmSheet
         isOpen={deleteStep === 'first'}
-        title="Delete all expenses?"
-        message="This will remove every expense from Home and Statistics."
-        confirmLabel="Delete All"
+        title="Tüm harcamalar silinsin mi?"
+        message="Bu işlem Ana Sayfa ve İstatistikler'deki tüm harcamaları kaldırır."
+        confirmLabel="Tümünü Sil"
+        cancelLabel="İptal"
         onClose={() => setDeleteStep('none')}
         onConfirm={() => setDeleteStep('second')}
       />
 
       <ConfirmSheet
         isOpen={deleteStep === 'second'}
-        title="This cannot be undone"
-        message="Are you sure you want to permanently delete all expenses?"
-        confirmLabel="Delete All"
+        title="Bu işlem geri alınamaz"
+        message="Tüm harcamaları kalıcı olarak silmek istediğinize emin misiniz?"
+        confirmLabel="Tümünü Sil"
+        cancelLabel="İptal"
         onClose={() => setDeleteStep('none')}
         onConfirm={handleDeleteAll}
       />
@@ -198,6 +221,7 @@ export function SettingsScreen({
         isOpen={feedback !== null}
         title={feedback?.title ?? ''}
         message={feedback?.message ?? ''}
+        closeLabel="Kapat"
         onClose={() => setFeedback(null)}
       />
     </SafeAreaView>
@@ -216,8 +240,9 @@ function createStyles(colors: ThemeColors) {
     scrollContent: {
       paddingTop: 8,
       paddingBottom: 32,
-      paddingHorizontal: 20,
-      gap: 28,
+    },
+    content: {
+      gap: 24,
     },
     header: {
       gap: 6,
@@ -233,6 +258,7 @@ function createStyles(colors: ThemeColors) {
       fontSize: 16,
       fontWeight: '500',
       color: colors.textSecondary,
+      letterSpacing: 0.2,
     },
     section: {
       gap: 12,
@@ -241,8 +267,15 @@ function createStyles(colors: ThemeColors) {
       fontSize: 13,
       fontWeight: '600',
       color: colors.textSecondary,
-      textTransform: 'uppercase',
       letterSpacing: 0.8,
+      paddingHorizontal: 4,
+    },
+    sectionCard: {
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
     },
   });
 }

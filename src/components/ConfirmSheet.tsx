@@ -8,6 +8,7 @@ type ConfirmSheetProps = {
   title: string;
   message: string;
   confirmLabel: string;
+  cancelLabel?: string;
   onConfirm: () => void;
   onClose: () => void;
 };
@@ -17,6 +18,7 @@ export function ConfirmSheet({
   title,
   message,
   confirmLabel,
+  cancelLabel = 'İptal',
   onConfirm,
   onClose,
 }: ConfirmSheetProps) {
@@ -45,7 +47,7 @@ export function ConfirmSheet({
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={styles.cancelText}>{cancelLabel}</Text>
             </Pressable>
 
             <Pressable

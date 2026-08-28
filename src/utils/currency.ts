@@ -4,9 +4,9 @@ const CURRENCY_CONFIG: Record<
   CurrencyCode,
   { symbol: string; locale: string; label: string }
 > = {
-  TRY: { symbol: '₺', locale: 'tr-TR', label: 'TRY ₺' },
-  USD: { symbol: '$', locale: 'en-US', label: 'USD $' },
-  EUR: { symbol: '€', locale: 'de-DE', label: 'EUR €' },
+  TRY: { symbol: '₺', locale: 'tr-TR', label: '₺ TRY' },
+  USD: { symbol: '$', locale: 'en-US', label: '$ USD' },
+  EUR: { symbol: '€', locale: 'de-DE', label: '€ EUR' },
 };
 
 export const currencyOptions: CurrencyOption[] = (

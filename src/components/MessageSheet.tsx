@@ -7,6 +7,7 @@ type MessageSheetProps = {
   isOpen: boolean;
   title: string;
   message: string;
+  closeLabel?: string;
   onClose: () => void;
 };
 
@@ -14,6 +15,7 @@ export function MessageSheet({
   isOpen,
   title,
   message,
+  closeLabel = 'Kapat',
   onClose,
 }: MessageSheetProps) {
   const styles = useThemedStyles(createStyles);
@@ -37,7 +39,7 @@ export function MessageSheet({
             onPress={onClose}
             style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}
           >
-            <Text style={styles.closeText}>Close</Text>
+            <Text style={styles.closeText}>{closeLabel}</Text>
           </Pressable>
         </View>
       </View>
