@@ -45,6 +45,12 @@
         }
       ],
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cf0762e6-3e8b-40d6-967c-0107515f7b5c"
+      }
+    },
+    "owner": "ayl1n"
   }
 }
