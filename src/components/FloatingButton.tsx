@@ -5,22 +5,27 @@ import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
 import type { FloatingButtonProps } from '../types/expense';
 
-const FAB_SIZE = 60;
-/** Horizontal gap from the screen edge (plus safe-area inset). */
-const FAB_RIGHT_GAP = 20;
+/** FAB diameter — keep in sync with button styles. */
+export const FAB_SIZE = 60;
+
+/** Gap between FAB and screen edges (before safe-area insets). */
+export const FAB_EDGE_GAP = 20;
+
 /**
- * Distance from the bottom of the Home screen content area.
- * High enough to clear search/filter when they sit near the fold,
- * while staying in the lower-right and above the tab bar (screen is already inset by the navigator).
+ * Scroll/content bottom inset so list items clear the floating FAB.
+ * size + edge gap above FAB + edge gap below FAB zone.
  */
-const FAB_BOTTOM_GAP = 88;
+export const FAB_SCROLL_INSET = FAB_SIZE + FAB_EDGE_GAP * 2;
 
 export function FloatingButton({ onPress }: FloatingButtonProps) {
   const styles = useThemedStyles(createStyles);
   const insets = useSafeAreaInsets();
 
-  const bottom = FAB_BOTTOM_GAP + Math.max(insets.bottom, 0);
-  const right = FAB_RIGHT_GAP + Math.max(insets.right, 0);
+  // Home sits above the tab bar; only add system insets (gesture/nav).
+  // Keep FAB in the true lower-right corner — large bottom offsets push it
+  // into the search/filter band when content is short.
+  const bottom = FAB_EDGE_GAP + Math.max(insets.bottom, 0);
+  const right = FAB_EDGE_GAP + Math.max(insets.right, 0);
 
   return (
     <Pressable

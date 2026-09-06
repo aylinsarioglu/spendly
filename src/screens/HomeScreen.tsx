@@ -16,7 +16,12 @@ import { BalanceCard } from '../components/BalanceCard';
 import { CategoryCard } from '../components/CategoryCard';
 import { ExpenseDetailModal } from '../components/ExpenseDetailModal';
 import { FilterBottomSheet } from '../components/FilterBottomSheet';
-import { FloatingButton } from '../components/FloatingButton';
+import {
+  FAB_EDGE_GAP,
+  FAB_SCROLL_INSET,
+  FAB_SIZE,
+  FloatingButton,
+} from '../components/FloatingButton';
 import { SearchBar } from '../components/SearchBar';
 import { TransactionCard } from '../components/TransactionCard';
 import { useAppSettings } from '../context/AppSettingsContext';
@@ -41,6 +46,8 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
   const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
+  // Reserve space under scroll content so search/filter/transactions clear the FAB.
+  const scrollBottomInset = FAB_SCROLL_INSET;
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -233,7 +240,10 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingHorizontal: horizontalPadding },
+          {
+            paddingHorizontal: horizontalPadding,
+            paddingBottom: scrollBottomInset,
+          },
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -342,7 +352,6 @@ function createStyles(colors: ThemeColors) {
   },
   scrollContent: {
     paddingTop: 8,
-    paddingBottom: 100,
     gap: 28,
   },
   header: {
@@ -447,8 +456,9 @@ function createStyles(colors: ThemeColors) {
   snackbar: {
     position: 'absolute',
     left: 20,
-    right: 96,
-    bottom: 36,
+    // Leave a column for the FAB: edge gap + size + gap.
+    right: FAB_EDGE_GAP + FAB_SIZE + FAB_EDGE_GAP,
+    bottom: FAB_EDGE_GAP + 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
