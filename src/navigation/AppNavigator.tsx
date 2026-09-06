@@ -33,7 +33,7 @@ export function AppNavigator({
       <Tab.Screen
         name="Home"
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: 'Ana Sayfa',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -45,7 +45,7 @@ export function AppNavigator({
       <Tab.Screen
         name="Statistics"
         options={{
-          tabBarLabel: 'Statistics',
+          tabBarLabel: 'İstatistikler',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="stats-chart-outline" size={size} color={color} />
           ),
@@ -57,7 +57,7 @@ export function AppNavigator({
       <Tab.Screen
         name="Settings"
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: 'Ayarlar',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings-outline" size={size} color={color} />
           ),

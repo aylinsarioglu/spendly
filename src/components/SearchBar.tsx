@@ -24,7 +24,7 @@ export function SearchBar({ value, onChangeText }: SearchBarProps) {
         style={styles.input}
         value={value}
         onChangeText={onChangeText}
-        placeholder="Search expenses..."
+        placeholder="Harcama ara..."
         placeholderTextColor={colors.textMuted}
         autoCapitalize="none"
         autoCorrect={false}

@@ -93,7 +93,7 @@ async function shareCsvOnNative(csv: string, filename: string): Promise<void> {
 
   await Sharing.shareAsync(file.uri, {
     mimeType: 'text/csv',
-    dialogTitle: 'Export Expenses',
+    dialogTitle: 'Harcamaları Dışa Aktar',
     UTI: 'public.comma-separated-values-text',
   });
 }

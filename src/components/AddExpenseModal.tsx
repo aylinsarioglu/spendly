@@ -116,12 +116,12 @@ export function AddExpenseModal({
           >
             <View style={styles.header}>
               <Text style={styles.title}>
-                {isEditMode ? 'Edit Expense' : 'Add Expense'}
+                {isEditMode ? 'Harcamayı Düzenle' : 'Harcama Ekle'}
               </Text>
               <Text style={styles.subtitle}>
                 {isEditMode
-                  ? 'Update an existing expense'
-                  : 'Save a new expense'}
+                  ? 'Mevcut harcamayı güncelle'
+                  : 'Yeni bir harcama kaydet'}
               </Text>
             </View>
 
@@ -208,7 +208,7 @@ export function AddExpenseModal({
                 ]}
               >
                 <Text style={styles.saveButtonText}>
-                  {isEditMode ? 'Update' : 'Save'}
+                  {isEditMode ? 'Güncelle' : 'Kaydet'}
                 </Text>
               </Pressable>
             </View>

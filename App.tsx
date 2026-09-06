@@ -79,7 +79,7 @@ function AppContent() {
       <>
         <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
         <View style={createLoadingStyles(colors).loadingContainer}>
-          <Text style={createLoadingStyles(colors).loadingText}>Loading...</Text>
+          <Text style={createLoadingStyles(colors).loadingText}>Yükleniyor...</Text>
         </View>
       </>
     );

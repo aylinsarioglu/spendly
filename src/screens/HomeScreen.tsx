@@ -207,11 +207,11 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
     if (visibleTransactions.length === 0) {
       return (
         <View style={styles.categorySection}>
-          <Text style={styles.sectionTitle}>Recent Transactions</Text>
+          <Text style={styles.sectionTitle}>Son İşlemler</Text>
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🔍</Text>
-            <Text style={styles.emptyTitle}>No expenses found</Text>
-            <Text style={styles.emptyDescription}>Try another keyword.</Text>
+            <Text style={styles.emptyTitle}>Harcama bulunamadı</Text>
+            <Text style={styles.emptyDescription}>Başka bir anahtar kelime dene.</Text>
           </View>
         </View>
       );
@@ -219,7 +219,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
 
     return (
       <View style={styles.categorySection}>
-        <Text style={styles.sectionTitle}>Recent Transactions</Text>
+        <Text style={styles.sectionTitle}>Son İşlemler</Text>
         <View style={styles.categoryList}>
           {visibleTransactions.map((expense) => (
             <TransactionCard
@@ -256,7 +256,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         <BalanceCard total={total} categoryCount={categoryCount} />
 
         <View style={styles.categorySection}>
-          <Text style={styles.sectionTitle}>Category Summary</Text>
+          <Text style={styles.sectionTitle}>Kategori Özeti</Text>
           <View style={styles.categoryList}>
             {groupedCategories.map((category) => (
               <CategoryCard key={category.category} category={category} />
@@ -297,7 +297,7 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
 
       {lastDeletedExpense ? (
         <View style={styles.snackbar}>
-          <Text style={styles.snackbarMessage}>Expense deleted</Text>
+          <Text style={styles.snackbarMessage}>Harcama silindi</Text>
           <Pressable
             onPress={handleUndoDelete}
             style={({ pressed }) => [
@@ -305,9 +305,9 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
               pressed && styles.undoButtonPressed,
             ]}
             accessibilityRole="button"
-            accessibilityLabel="Undo delete"
+            accessibilityLabel="Silmeyi geri al"
           >
-            <Text style={styles.undoButtonText}>UNDO</Text>
+            <Text style={styles.undoButtonText}>GERİ AL</Text>
           </Pressable>
         </View>
       ) : null}

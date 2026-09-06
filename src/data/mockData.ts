@@ -1,5 +1,8 @@
 import type { Expense } from '../types/expense';
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const now = Date.now();
+
 export const initialExpenses: Expense[] = [
   {
     id: '1',
@@ -7,7 +10,7 @@ export const initialExpenses: Expense[] = [
     category: 'Yemek',
     emoji: '🍔',
     note: '',
-    createdAt: '2026-08-09T10:00:00.000Z',
+    createdAt: new Date(now - 1 * DAY_MS).toISOString(),
   },
   {
     id: '2',
@@ -15,7 +18,7 @@ export const initialExpenses: Expense[] = [
     category: 'Ulaşım',
     emoji: '🚕',
     note: '',
-    createdAt: '2026-08-08T14:30:00.000Z',
+    createdAt: new Date(now - 2 * DAY_MS).toISOString(),
   },
   {
     id: '3',
@@ -23,6 +26,6 @@ export const initialExpenses: Expense[] = [
     category: 'Alışveriş',
     emoji: '🛍️',
     note: '',
-    createdAt: '2026-08-07T09:15:00.000Z',
+    createdAt: new Date(now - 3 * DAY_MS).toISOString(),
   },
 ];

@@ -51,8 +51,8 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Statistics</Text>
-          <Text style={styles.subtitle}>Bu ayın harcama özeti</Text>
+          <Text style={styles.title}>İstatistikler</Text>
+          <Text style={styles.subtitle}>Harcama özeti</Text>
         </View>
 
         <View style={styles.statsGrid}>

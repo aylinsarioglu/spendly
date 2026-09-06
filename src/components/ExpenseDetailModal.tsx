@@ -15,7 +15,7 @@ export function ExpenseDetailModal({
 }: ExpenseDetailModalProps) {
   const { formatMoney } = useAppSettings();
   const styles = useThemedStyles(createStyles);
-  const note = expense?.note.trim() || 'No note';
+  const note = expense?.note.trim() || 'Not yok';
 
   return (
     <Modal
@@ -36,16 +36,16 @@ export function ExpenseDetailModal({
                 <Text style={styles.emoji}>{expense.emoji}</Text>
               </View>
 
-              <Text style={styles.title}>Expense Detail</Text>
+              <Text style={styles.title}>Harcama Detayı</Text>
 
               <View style={styles.details}>
-                <DetailRow label="Category" value={expense.category} />
+                <DetailRow label="Kategori" value={expense.category} />
                 <DetailRow
-                  label="Amount"
+                  label="Tutar"
                   value={formatMoney(expense.amount)}
                   highlight
                 />
-                <DetailRow label="Note" value={note} />
+                <DetailRow label="Not" value={note} />
                 <DetailRow
                   label="Tarih"
                   value={formatExpenseFullDate(getSafeCreatedAt(expense))}
@@ -60,7 +60,7 @@ export function ExpenseDetailModal({
                     pressed && styles.buttonPressed,
                   ]}
                 >
-                  <Text style={styles.closeButtonText}>Close</Text>
+                  <Text style={styles.closeButtonText}>Kapat</Text>
                 </Pressable>
 
                 <Pressable
@@ -70,7 +70,7 @@ export function ExpenseDetailModal({
                     pressed && styles.buttonPressed,
                   ]}
                 >
-                  <Text style={styles.editButtonText}>Edit</Text>
+                  <Text style={styles.editButtonText}>Düzenle</Text>
                 </Pressable>
 
                 <Pressable
@@ -80,7 +80,7 @@ export function ExpenseDetailModal({
                     pressed && styles.buttonPressed,
                   ]}
                 >
-                  <Text style={styles.deleteButtonText}>Delete</Text>
+                  <Text style={styles.deleteButtonText}>Sil</Text>
                 </Pressable>
               </View>
             </>

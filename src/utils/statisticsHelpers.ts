@@ -5,7 +5,6 @@ import type {
   GroupedCategory,
   PieChartSlice,
 } from '../types/expense';
-import { getExpensesInCurrentMonth } from './date';
 import { groupExpensesByCategory } from './groupExpensesByCategory';
 
 const CHART_COLORS = [
@@ -25,21 +24,20 @@ export function getCategorySummary(expenses: Expense[]): GroupedCategory[] {
 }
 
 export function getExpenseStatistics(expenses: Expense[]): ExpenseStatistics {
-  const monthlyExpenses = getExpensesInCurrentMonth(expenses);
-
-  const categorySummary = getCategorySummary(monthlyExpenses);
-  const totalSpending = monthlyExpenses.reduce(
+  // Use the same full expenses list as Home (shared App state / AsyncStorage).
+  const categorySummary = getCategorySummary(expenses);
+  const totalSpending = expenses.reduce(
     (total, expense) => total + expense.amount,
     0,
   );
-  const transactionCount = monthlyExpenses.length;
+  const transactionCount = expenses.length;
 
   const categorySpending: CategorySpending[] = categorySummary.map(
     (summary) => ({
       category: summary.category,
       emoji: summary.emoji,
       amount: summary.amount,
-      count: monthlyExpenses.filter(
+      count: expenses.filter(
         (expense) => expense.category === summary.category,
       ).length,
     }),
