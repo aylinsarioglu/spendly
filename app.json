@@ -41,7 +41,8 @@
             "image": "./assets/splash.png"
           }
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }
