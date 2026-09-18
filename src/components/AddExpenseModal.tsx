@@ -17,6 +17,7 @@ import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
 import type { AddExpenseModalProps } from '../types/expense';
 import { getCurrencySymbol } from '../utils/currency';
+import { CategoryIcon } from './CategoryIcon';
 
 export function AddExpenseModal({
   isOpen,
@@ -158,7 +159,7 @@ export function AddExpenseModal({
                         isSelected && styles.categoryChipSelected,
                       ]}
                     >
-                      <Text style={styles.categoryEmoji}>{option.emoji}</Text>
+                      <CategoryIcon category={option.name} size={28} />
                       <Text
                         style={[
                           styles.categoryName,
@@ -320,9 +321,6 @@ function createStyles(colors: ThemeColors) {
   categoryChipSelected: {
     backgroundColor: colors.accentSoft,
     borderColor: colors.accent,
-  },
-  categoryEmoji: {
-    fontSize: 18,
   },
   categoryName: {
     fontSize: 15,

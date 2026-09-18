@@ -4,9 +4,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
+import type { IoniconName } from '../theme/icons';
 
 type SettingsRowProps = {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: IoniconName;
   title: string;
   description: string;
   value?: string;

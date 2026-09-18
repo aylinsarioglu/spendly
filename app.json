@@ -44,7 +44,14 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Spendly uygulama kilidini açmak için Face ID kullanır."
+        }
+      ]
     ],
     "extra": {
       "eas": {

@@ -5,6 +5,7 @@ import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
 import type { ExpenseDetailModalProps } from '../types/expense';
 import { formatExpenseFullDate, getSafeCreatedAt } from '../utils/date';
+import { CategoryIcon } from './CategoryIcon';
 
 export function ExpenseDetailModal({
   visible,
@@ -32,9 +33,7 @@ export function ExpenseDetailModal({
 
           {expense ? (
             <>
-              <View style={styles.emojiContainer}>
-                <Text style={styles.emoji}>{expense.emoji}</Text>
-              </View>
+              <CategoryIcon category={expense.category} size={72} />
 
               <Text style={styles.title}>Harcama Detayı</Text>
 
@@ -137,18 +136,6 @@ function createStyles(colors: ThemeColors) {
     height: 4,
     borderRadius: 2,
     backgroundColor: colors.border,
-  },
-  emojiContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    backgroundColor: colors.input,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-  },
-  emoji: {
-    fontSize: 36,
   },
   title: {
     fontSize: 22,

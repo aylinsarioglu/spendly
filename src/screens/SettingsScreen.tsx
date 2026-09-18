@@ -13,6 +13,7 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { themeOptions } from '../data/settingsOptions';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
+import { settingsIcons } from '../theme/icons';
 import type { SettingsScreenProps } from '../types/expense';
 import type { CurrencyCode, ThemeMode } from '../types/settings';
 import { currencyOptions } from '../utils/currency';
@@ -108,7 +109,7 @@ export function SettingsScreen({
             <Text style={styles.sectionLabel}>GENEL</Text>
             <View style={styles.sectionCard}>
               <SettingsRow
-                icon="cash-outline"
+                icon={settingsIcons.currency}
                 title="Para Birimi"
                 description="Ana Sayfa ve İstatistikler'de kullanılır"
                 value={currencyLabel}
@@ -116,7 +117,7 @@ export function SettingsScreen({
                 onPress={() => setPicker('currency')}
               />
               <SettingsRow
-                icon="moon-outline"
+                icon={settingsIcons.theme}
                 title="Tema"
                 description="Spendly görünümünü değiştir"
                 value={themeLabel}
@@ -129,7 +130,7 @@ export function SettingsScreen({
             <Text style={styles.sectionLabel}>VERİLER</Text>
             <View style={styles.sectionCard}>
               <SettingsRow
-                icon="download-outline"
+                icon={settingsIcons.export}
                 title="Harcamaları Dışa Aktar"
                 description="Tüm harcamaları CSV olarak dışa aktar"
                 showDivider
@@ -138,7 +139,7 @@ export function SettingsScreen({
                 }}
               />
               <SettingsRow
-                icon="trash-outline"
+                icon={settingsIcons.deleteAll}
                 title="Tüm Harcamaları Sil"
                 description="Kaydedilen tüm harcamaları kalıcı olarak sil"
                 destructive
@@ -151,14 +152,14 @@ export function SettingsScreen({
             <Text style={styles.sectionLabel}>HAKKINDA</Text>
             <View style={styles.sectionCard}>
               <SettingsRow
-                icon="information-circle-outline"
+                icon={settingsIcons.version}
                 title="Uygulama Sürümü"
                 description="Mevcut Spendly sürümü"
                 value={APP_VERSION}
                 showDivider
               />
               <SettingsRow
-                icon="sparkles-outline"
+                icon={settingsIcons.about}
                 title="Spendly Hakkında"
                 description="Kişisel harcama takip uygulaması"
                 onPress={() => setPicker('about')}

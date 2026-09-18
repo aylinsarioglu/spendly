@@ -5,6 +5,7 @@ import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
 import type { TransactionCardProps } from '../types/expense';
 import { formatExpenseDate, getSafeCreatedAt } from '../utils/date';
+import { CategoryIcon } from './CategoryIcon';
 
 export function TransactionCard({ expense, onPress }: TransactionCardProps) {
   const { formatMoney } = useAppSettings();
@@ -17,9 +18,7 @@ export function TransactionCard({ expense, onPress }: TransactionCardProps) {
       onPress={() => onPress?.(expense)}
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
-      <View style={styles.emojiContainer}>
-        <Text style={styles.emoji}>{expense.emoji}</Text>
-      </View>
+      <CategoryIcon category={expense.category} size={40} />
 
       <View style={styles.content}>
         <Text style={styles.category}>{expense.category}</Text>
@@ -52,17 +51,6 @@ function createStyles(colors: ThemeColors) {
     cardPressed: {
       opacity: 0.88,
       backgroundColor: colors.cardElevated,
-    },
-    emojiContainer: {
-      width: 40,
-      height: 40,
-      borderRadius: 12,
-      backgroundColor: colors.cardElevated,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    emoji: {
-      fontSize: 20,
     },
     content: {
       flex: 1,

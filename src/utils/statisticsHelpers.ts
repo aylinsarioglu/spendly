@@ -5,17 +5,8 @@ import type {
   GroupedCategory,
   PieChartSlice,
 } from '../types/expense';
+import { getCategoryVisual } from '../theme/categoryVisuals';
 import { groupExpensesByCategory } from './groupExpensesByCategory';
-
-const CHART_COLORS = [
-  '#6C5CE7',
-  '#A29BFE',
-  '#FD79A8',
-  '#FDCB6E',
-  '#00CEC9',
-  '#55EFC4',
-  '#74B9FF',
-] as const;
 
 export function getCategorySummary(expenses: Expense[]): GroupedCategory[] {
   return groupExpensesByCategory(expenses)
@@ -26,6 +17,7 @@ export function getCategorySummary(expenses: Expense[]): GroupedCategory[] {
 export function getExpenseStatistics(expenses: Expense[]): ExpenseStatistics {
   // Use the same full expenses list as Home (shared App state / AsyncStorage).
   const categorySummary = getCategorySummary(expenses);
+  
   const totalSpending = expenses.reduce(
     (total, expense) => total + expense.amount,
     0,
@@ -65,10 +57,10 @@ export function getPieChartData(
 ): PieChartSlice[] {
   return categorySummary
     .filter((item) => item.amount > 0)
-    .map((item, index) => ({
+    .map((item) => ({
       name: item.category,
       population: item.amount,
-      color: CHART_COLORS[index % CHART_COLORS.length],
+      color: getCategoryVisual(item.category).chartColor,
       legendFontColor,
       legendFontSize: 12,
     }));

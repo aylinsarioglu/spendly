@@ -9,6 +9,7 @@ import {
 import { PieChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { CategoryIcon } from '../components/CategoryIcon';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
@@ -35,9 +36,9 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
     [statistics.categorySummary, colors.textPrimary],
   );
 
-  const highestCategoryLabel =
-    statistics.highestSpendingCategoryEmoji.length > 0
-      ? `${statistics.highestSpendingCategoryEmoji} ${statistics.highestSpendingCategory}`
+  const highestCategory =
+    statistics.highestSpendingCategory === '-'
+      ? undefined
       : statistics.highestSpendingCategory;
 
   return (
@@ -70,7 +71,8 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
           />
           <StatCard
             label="En Çok Harcama Yapılan Kategori"
-            value={highestCategoryLabel}
+            value={statistics.highestSpendingCategory}
+            category={highestCategory}
           />
         </View>
 
@@ -119,16 +121,26 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
 type StatCardProps = {
   label: string;
   value: string;
+  category?: string;
 };
 
-function StatCard({ label, value }: StatCardProps) {
+function StatCard({ label, value, category }: StatCardProps) {
   const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.statCard}>
       <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue} numberOfLines={2}>
-        {value}
-      </Text>
+      {category ? (
+        <View style={styles.statValueRow}>
+          <CategoryIcon category={category} size={28} />
+          <Text style={styles.statValue} numberOfLines={2}>
+            {value}
+          </Text>
+        </View>
+      ) : (
+        <Text style={styles.statValue} numberOfLines={2}>
+          {value}
+        </Text>
+      )}
     </View>
   );
 }
@@ -142,7 +154,7 @@ function CategoryDistributionRow({ item }: CategoryDistributionRowProps) {
   const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.categoryRow}>
-      <Text style={styles.categoryEmoji}>{item.emoji}</Text>
+      <CategoryIcon category={item.category} size={40} />
       <Text style={styles.categoryName}>{item.category}</Text>
       <View style={styles.dottedLine} />
       <Text style={styles.categoryAmount}>{formatMoney(item.amount)}</Text>
@@ -208,6 +220,12 @@ function createStyles(colors: ThemeColors) {
     fontWeight: '700',
     color: colors.textPrimary,
     letterSpacing: -0.3,
+    flexShrink: 1,
+  },
+  statValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   chartSection: {
     gap: 16,
@@ -241,9 +259,6 @@ function createStyles(colors: ThemeColors) {
     borderWidth: 1,
     borderColor: colors.border,
     gap: 10,
-  },
-  categoryEmoji: {
-    fontSize: 24,
   },
   categoryName: {
     fontSize: 17,

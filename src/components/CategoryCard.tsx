@@ -4,6 +4,7 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
 import type { CategoryCardProps } from '../types/expense';
+import { CategoryIcon } from './CategoryIcon';
 
 export function CategoryCard({ category }: CategoryCardProps) {
   const { formatMoney } = useAppSettings();
@@ -12,9 +13,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.left}>
-        <View style={styles.emojiContainer}>
-          <Text style={styles.emoji}>{category.emoji}</Text>
-        </View>
+        <CategoryIcon category={category.category} size={48} />
         <Text style={styles.name}>{category.category}</Text>
       </View>
       <Text style={styles.amount}>{formatMoney(category.amount)}</Text>
@@ -39,17 +38,6 @@ function createStyles(colors: ThemeColors) {
       alignItems: 'center',
       gap: 14,
       flex: 1,
-    },
-    emojiContainer: {
-      width: 48,
-      height: 48,
-      borderRadius: 14,
-      backgroundColor: colors.cardElevated,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    emoji: {
-      fontSize: 24,
     },
     name: {
       fontSize: 17,

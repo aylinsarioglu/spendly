@@ -8,6 +8,7 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { StatisticsScreen } from '../screens/StatisticsScreen';
 import type { ThemeColors } from '../theme/colors';
+import { tabIcons } from '../theme/icons';
 import type { AppNavigatorProps, RootTabParamList } from '../types/expense';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -34,8 +35,12 @@ export function AppNavigator({
         name="Home"
         options={{
           tabBarLabel: 'Ana Sayfa',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? tabIcons.home.filled : tabIcons.home.outline}
+              size={size}
+              color={color}
+            />
           ),
         }}
       >
@@ -46,8 +51,16 @@ export function AppNavigator({
         name="Statistics"
         options={{
           tabBarLabel: 'İstatistikler',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="stats-chart-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={
+                focused
+                  ? tabIcons.statistics.filled
+                  : tabIcons.statistics.outline
+              }
+              size={size}
+              color={color}
+            />
           ),
         }}
       >
@@ -58,8 +71,16 @@ export function AppNavigator({
         name="Settings"
         options={{
           tabBarLabel: 'Ayarlar',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={
+                focused
+                  ? tabIcons.settings.filled
+                  : tabIcons.settings.outline
+              }
+              size={size}
+              color={color}
+            />
           ),
         }}
       >
