@@ -43,6 +43,7 @@ function createStyles(colors: ThemeColors) {
     container: {
       flexDirection: 'row',
       alignItems: 'center',
+      minWidth: 0,
       backgroundColor: colors.card,
       borderRadius: 16,
       borderWidth: 1,
@@ -59,6 +60,7 @@ function createStyles(colors: ThemeColors) {
     },
     input: {
       flex: 1,
+      minWidth: 0,
       fontSize: 15,
       fontWeight: '500',
       color: colors.textPrimary,

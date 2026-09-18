@@ -21,16 +21,27 @@ export function TransactionCard({ expense, onPress }: TransactionCardProps) {
       <CategoryIcon category={expense.category} size={40} />
 
       <View style={styles.content}>
-        <Text style={styles.category}>{expense.category}</Text>
+        <Text style={styles.category} numberOfLines={1}>
+          {expense.category}
+        </Text>
         {note ? (
           <Text style={styles.note} numberOfLines={1}>
             {note}
           </Text>
         ) : null}
-        <Text style={styles.date}>{createdAtLabel}</Text>
+        <Text style={styles.date} numberOfLines={1}>
+          {createdAtLabel}
+        </Text>
       </View>
 
-      <Text style={styles.amount}>{formatMoney(expense.amount)}</Text>
+      <Text
+        style={styles.amount}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
+        {formatMoney(expense.amount)}
+      </Text>
     </Pressable>
   );
 }
@@ -42,8 +53,8 @@ function createStyles(colors: ThemeColors) {
       alignItems: 'center',
       gap: 12,
       backgroundColor: colors.card,
-      borderRadius: 14,
-      paddingVertical: 12,
+      borderRadius: 18,
+      paddingVertical: 14,
       paddingHorizontal: 14,
       borderWidth: 1,
       borderColor: colors.border,
@@ -54,6 +65,7 @@ function createStyles(colors: ThemeColors) {
     },
     content: {
       flex: 1,
+      minWidth: 0,
       gap: 2,
     },
     category: {
@@ -64,6 +76,7 @@ function createStyles(colors: ThemeColors) {
     },
     note: {
       fontSize: 13,
+      fontWeight: '500',
       color: colors.textSecondary,
     },
     date: {
@@ -72,10 +85,13 @@ function createStyles(colors: ThemeColors) {
       color: colors.textMuted,
     },
     amount: {
-      fontSize: 15,
+      maxWidth: '42%',
+      flexShrink: 0,
+      fontSize: 16,
       fontWeight: '700',
       color: colors.textPrimary,
-      letterSpacing: -0.2,
+      letterSpacing: -0.3,
+      textAlign: 'right',
     },
   });
 }

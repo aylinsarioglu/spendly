@@ -13,10 +13,19 @@ export function CategoryCard({ category }: CategoryCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.left}>
-        <CategoryIcon category={category.category} size={48} />
-        <Text style={styles.name}>{category.category}</Text>
+        <CategoryIcon category={category.category} size={40} />
+        <Text style={styles.name} numberOfLines={1}>
+          {category.category}
+        </Text>
       </View>
-      <Text style={styles.amount}>{formatMoney(category.amount)}</Text>
+      <Text
+        style={styles.amount}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
+        {formatMoney(category.amount)}
+      </Text>
     </View>
   );
 }
@@ -27,29 +36,36 @@ function createStyles(colors: ThemeColors) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      gap: 12,
       backgroundColor: colors.card,
       borderRadius: 18,
-      padding: 18,
+      paddingVertical: 14,
+      paddingHorizontal: 14,
       borderWidth: 1,
       borderColor: colors.border,
     },
     left: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 14,
+      gap: 12,
       flex: 1,
+      minWidth: 0,
     },
     name: {
-      fontSize: 17,
+      flex: 1,
+      fontSize: 16,
       fontWeight: '600',
       color: colors.textPrimary,
       letterSpacing: -0.2,
     },
     amount: {
-      fontSize: 17,
+      maxWidth: '42%',
+      flexShrink: 0,
+      fontSize: 16,
       fontWeight: '700',
       color: colors.textPrimary,
-      letterSpacing: -0.2,
+      letterSpacing: -0.3,
+      textAlign: 'right',
     },
   });
 }

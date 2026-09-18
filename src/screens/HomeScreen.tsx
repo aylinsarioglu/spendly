@@ -195,7 +195,9 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
     if (expenses.length === 0) {
       return (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyEmoji}>📭</Text>
+          <View style={styles.emptyIconWrap}>
+            <Ionicons name="wallet-outline" size={26} color={colors.accent} />
+          </View>
           <Text style={styles.emptyTitle}>Henüz harcama yok</Text>
           <Text style={styles.emptyDescription}>
             İlk harcamanı eklemek için{'\n'}sağ alttaki + butonuna dokun.
@@ -209,7 +211,9 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
         <View style={styles.categorySection}>
           <Text style={styles.sectionTitle}>Son İşlemler</Text>
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🔍</Text>
+            <View style={styles.emptyIconWrap}>
+              <Ionicons name="search-outline" size={26} color={colors.accent} />
+            </View>
             <Text style={styles.emptyTitle}>Harcama bulunamadı</Text>
             <Text style={styles.emptyDescription}>Başka bir anahtar kelime dene.</Text>
           </View>
@@ -250,19 +254,20 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
       >
         <View style={styles.header}>
           <Text style={styles.appTitle}>Spendly</Text>
-          <Text style={styles.periodLabel}>Bu Ay</Text>
         </View>
 
         <BalanceCard total={total} categoryCount={categoryCount} />
 
-        <View style={styles.categorySection}>
-          <Text style={styles.sectionTitle}>Kategori Özeti</Text>
-          <View style={styles.categoryList}>
-            {groupedCategories.map((category) => (
-              <CategoryCard key={category.category} category={category} />
-            ))}
+        {groupedCategories.length > 0 ? (
+          <View style={styles.categorySection}>
+            <Text style={styles.sectionTitle}>Kategori Özeti</Text>
+            <View style={styles.categoryList}>
+              {groupedCategories.map((category) => (
+                <CategoryCard key={category.category} category={category} />
+              ))}
+            </View>
           </View>
-        </View>
+        ) : null}
 
         <View style={styles.searchRow}>
           <View style={styles.searchBarWrap}>
@@ -280,9 +285,9 @@ export function HomeScreen({ expenses, setExpenses }: HomeScreenProps) {
             accessibilityLabel="Filtrele"
           >
             <Ionicons
-              name="options-outline"
+              name="filter-outline"
               size={20}
-              color={isFilterActive ? colors.accent : colors.textPrimary}
+              color={isFilterActive ? colors.accent : colors.textSecondary}
             />
             {activeFilterCount > 0 ? (
               <View style={styles.filterBadge}>
@@ -351,24 +356,17 @@ function createStyles(colors: ThemeColors) {
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 8,
-    gap: 28,
+    paddingTop: 4,
+    gap: 22,
   },
   header: {
-    gap: 6,
-    marginTop: 8,
+    marginTop: 4,
   },
   appTitle: {
-    fontSize: 34,
+    fontSize: 28,
     fontWeight: '700',
-    letterSpacing: -0.5,
+    letterSpacing: -0.7,
     color: colors.textPrimary,
-  },
-  periodLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.textSecondary,
-    letterSpacing: 0.2,
   },
   searchRow: {
     flexDirection: 'row',
@@ -377,10 +375,12 @@ function createStyles(colors: ThemeColors) {
   },
   searchBarWrap: {
     flex: 1,
+    minWidth: 0,
   },
   filterButton: {
     width: 48,
     height: 48,
+    flexShrink: 0,
     borderRadius: 16,
     backgroundColor: colors.card,
     borderWidth: 1,
@@ -416,10 +416,10 @@ function createStyles(colors: ThemeColors) {
     gap: 16,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: colors.textPrimary,
-    letterSpacing: -0.3,
+    letterSpacing: -0.2,
   },
   categoryList: {
     gap: 12,
@@ -431,16 +431,23 @@ function createStyles(colors: ThemeColors) {
     borderRadius: 18,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingVertical: 48,
-    paddingHorizontal: 28,
-    gap: 12,
+    paddingVertical: 40,
+    paddingHorizontal: 24,
+    gap: 10,
   },
-  emptyEmoji: {
-    fontSize: 56,
+  emptyIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: colors.accentSoft,
+    borderWidth: 1,
+    borderColor: 'rgba(108, 92, 231, 0.28)',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 4,
   },
   emptyTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
     letterSpacing: -0.3,
@@ -469,11 +476,6 @@ function createStyles(colors: ThemeColors) {
     borderColor: colors.border,
     paddingVertical: 14,
     paddingHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 12,
   },
   snackbarMessage: {
     flex: 1,

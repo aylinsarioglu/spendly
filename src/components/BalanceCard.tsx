@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useThemedStyles } from '../hooks/useThemedStyles';
@@ -12,11 +12,21 @@ export function BalanceCard({
 }: BalanceCardProps) {
   const { formatMoney } = useAppSettings();
   const styles = useThemedStyles(createStyles);
+  const { width } = useWindowDimensions();
+  const amountSize = width < 360 ? 32 : width < 400 ? 36 : 40;
 
   return (
     <View style={styles.card}>
+      <Text style={styles.period}>Bu Ay</Text>
       <Text style={styles.label}>{label}</Text>
-      <Text style={styles.amount}>{formatMoney(total)}</Text>
+      <Text
+        style={[styles.amount, { fontSize: amountSize, lineHeight: amountSize + 8 }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.55}
+      >
+        {formatMoney(total)}
+      </Text>
       <View style={styles.badge}>
         <Text style={styles.badgeText}>{categoryCount} kategori</Text>
       </View>
@@ -27,36 +37,45 @@ export function BalanceCard({
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     card: {
-      backgroundColor: colors.cardElevated,
+      backgroundColor: colors.card,
       borderRadius: 24,
-      padding: 28,
+      paddingVertical: 24,
+      paddingHorizontal: 22,
       borderWidth: 1,
       borderColor: colors.border,
-      gap: 8,
+      gap: 6,
+    },
+    period: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: colors.accent,
+      letterSpacing: 1.4,
+      textTransform: 'uppercase',
     },
     label: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: '500',
       color: colors.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 1,
+      letterSpacing: 0.2,
     },
     amount: {
-      fontSize: 42,
       fontWeight: '700',
       color: colors.textPrimary,
-      letterSpacing: -1,
+      letterSpacing: -1.2,
+      marginTop: 4,
     },
     badge: {
       alignSelf: 'flex-start',
-      marginTop: 8,
+      marginTop: 10,
       backgroundColor: colors.accentSoft,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 20,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: 'rgba(108, 92, 231, 0.28)',
     },
     badgeText: {
-      fontSize: 13,
+      fontSize: 12,
       fontWeight: '600',
       color: colors.accent,
     },
