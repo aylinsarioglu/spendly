@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppSplash } from './src/components/AppSplash';
+import { AppLockProvider, useAppLock } from './src/context/AppLockContext';
 import { AppSettingsProvider, useAppSettings } from './src/context/AppSettingsContext';
 import { initialExpenses } from './src/data/mockData';
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { LockScreen } from './src/screens/LockScreen';
 import type { Expense } from './src/types/expense';
 import { clearExpenses, loadExpenses, saveExpenses } from './src/utils/storage';
 
@@ -14,7 +16,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AppSettingsProvider>
-        <AppContent />
+        <AppLockProvider>
+          <AppContent />
+        </AppLockProvider>
       </AppSettingsProvider>
     </SafeAreaProvider>
   );
@@ -22,6 +26,7 @@ export default function App() {
 
 function AppContent() {
   const { ready, colors, theme } = useAppSettings();
+  const { ready: lockReady, enabled, isLocked } = useAppLock();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,13 +78,17 @@ function AppContent() {
     },
   };
 
-  if (!ready || loading) {
+  if (!ready || loading || !lockReady) {
     return (
       <>
         <StatusBar style="light" />
         <AppSplash />
       </>
     );
+  }
+
+  if (enabled && isLocked) {
+    return <LockScreen />;
   }
 
   return (

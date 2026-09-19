@@ -7,8 +7,10 @@ import { AboutSheet } from '../components/AboutSheet';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import { MessageSheet } from '../components/MessageSheet';
 import { OptionPickerSheet } from '../components/OptionPickerSheet';
+import { PinEntrySheet, type PinEntryMode } from '../components/PinEntrySheet';
 import { SettingsRow } from '../components/SettingsRow';
 import { APP_VERSION } from '../constants/app';
+import { useAppLock } from '../context/AppLockContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { themeOptions } from '../data/settingsOptions';
 import { useThemedStyles } from '../hooks/useThemedStyles';
@@ -21,6 +23,7 @@ import { exportExpenses } from '../utils/exportExpenses';
 
 type Picker = 'none' | 'currency' | 'theme' | 'about';
 type DeleteStep = 'none' | 'first' | 'second';
+type PinSheet = 'none' | PinEntryMode;
 
 function isShareCancelled(error: unknown): boolean {
   const message =
@@ -41,8 +44,11 @@ export function SettingsScreen({
   const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
   const { currency, theme, setCurrency, setTheme } = useAppSettings();
+  const { available: lockAvailable, enabled: lockEnabled } = useAppLock();
   const [picker, setPicker] = useState<Picker>('none');
   const [deleteStep, setDeleteStep] = useState<DeleteStep>('none');
+  const [pinSheet, setPinSheet] = useState<PinSheet>('none');
+  const [disableLockConfirm, setDisableLockConfirm] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
 
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
@@ -85,6 +91,42 @@ export function SettingsScreen({
     }
   };
 
+  const handleAppLockPress = () => {
+    if (!lockAvailable) {
+      setFeedback({
+        title: 'Uygulama Kilidi',
+        message: 'Uygulama kilidi bu cihazda kullanılamıyor.',
+      });
+      return;
+    }
+
+    if (lockEnabled) {
+      setDisableLockConfirm(true);
+      return;
+    }
+
+    setPinSheet('create');
+  };
+
+  const handlePinSuccess = () => {
+    if (pinSheet === 'create') {
+      setFeedback({
+        title: 'Uygulama Kilidi',
+        message: 'Uygulama kilidi açıldı.',
+      });
+    } else if (pinSheet === 'disable') {
+      setFeedback({
+        title: 'Uygulama Kilidi',
+        message: 'Uygulama kilidi kapatıldı.',
+      });
+    } else if (pinSheet === 'change') {
+      setFeedback({
+        title: 'PIN Değiştir',
+        message: 'PIN başarıyla değiştirildi.',
+      });
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
@@ -123,6 +165,32 @@ export function SettingsScreen({
                 value={themeLabel}
                 onPress={() => setPicker('theme')}
               />
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>GÜVENLİK</Text>
+            <View style={styles.sectionCard}>
+              <SettingsRow
+                icon={settingsIcons.appLock}
+                title="Uygulama Kilidi"
+                description={
+                  lockAvailable
+                    ? 'Uygulamayı 6 haneli PIN ile koru'
+                    : 'Android ve iOS cihazlarda kullanılabilir'
+                }
+                value={lockEnabled ? 'Açık' : 'Kapalı'}
+                showDivider={lockEnabled}
+                onPress={handleAppLockPress}
+              />
+              {lockEnabled ? (
+                <SettingsRow
+                  icon={settingsIcons.changePin}
+                  title="PIN Değiştir"
+                  description="6 haneli PIN'inizi güncelleyin"
+                  onPress={() => setPinSheet('change')}
+                />
+              ) : null}
             </View>
           </View>
 
@@ -211,6 +279,32 @@ export function SettingsScreen({
         cancelLabel="İptal"
         onClose={() => setDeleteStep('none')}
         onConfirm={handleDeleteAll}
+      />
+
+      <ConfirmSheet
+        isOpen={disableLockConfirm}
+        title="Uygulama kilidi kapatılsın mı?"
+        message="Kilidi kapatmak için mevcut PIN'inizi girmeniz gerekir."
+        confirmLabel="Devam"
+        cancelLabel="İptal"
+        onClose={() => setDisableLockConfirm(false)}
+        onConfirm={() => {
+          setDisableLockConfirm(false);
+          setPinSheet('disable');
+        }}
+      />
+
+      <PinEntrySheet
+        isOpen={pinSheet !== 'none'}
+        mode={pinSheet === 'none' ? 'create' : pinSheet}
+        onClose={() => setPinSheet('none')}
+        onSuccess={handlePinSuccess}
+        onFailure={(message) => {
+          setFeedback({
+            title: 'Uygulama Kilidi',
+            message,
+          });
+        }}
       />
 
       <AboutSheet
