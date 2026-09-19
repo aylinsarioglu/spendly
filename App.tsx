@@ -1,13 +1,12 @@
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppSplash } from './src/components/AppSplash';
 import { AppSettingsProvider, useAppSettings } from './src/context/AppSettingsContext';
 import { initialExpenses } from './src/data/mockData';
 import { AppNavigator } from './src/navigation/AppNavigator';
-import type { ThemeColors } from './src/theme/colors';
 import type { Expense } from './src/types/expense';
 import { clearExpenses, loadExpenses, saveExpenses } from './src/utils/storage';
 
@@ -77,10 +76,8 @@ function AppContent() {
   if (!ready || loading) {
     return (
       <>
-        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-        <View style={createLoadingStyles(colors).loadingContainer}>
-          <Text style={createLoadingStyles(colors).loadingText}>Yükleniyor...</Text>
-        </View>
+        <StatusBar style="light" />
+        <AppSplash />
       </>
     );
   }
@@ -97,20 +94,4 @@ function AppContent() {
       </NavigationContainer>
     </>
   );
-}
-
-function createLoadingStyles(colors: ThemeColors) {
-  return StyleSheet.create({
-    loadingContainer: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.background,
-    },
-    loadingText: {
-      fontSize: 16,
-      fontWeight: '500',
-      color: colors.textSecondary,
-    },
-  });
 }

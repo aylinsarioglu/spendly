@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
 import {
   ScrollView,
@@ -13,18 +15,24 @@ import { CategoryIcon } from '../components/CategoryIcon';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import type { ThemeColors } from '../theme/colors';
+import { tabIcons } from '../theme/icons';
 import type { CategorySpending, StatisticsScreenProps } from '../types/expense';
 import {
   getExpenseStatistics,
   getPieChartData,
 } from '../utils/statisticsHelpers';
 
+const GRID_GAP = 12;
+const CHART_HEIGHT = 200;
+
 export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
-  const { colors, formatMoney } = useAppSettings();
+  const { colors, formatMoney, theme } = useAppSettings();
   const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(20, Math.min(32, width * 0.06));
-  const chartWidth = width - horizontalPadding * 2 - 32;
+  const contentWidth = width - horizontalPadding * 2;
+  const statCardWidth = (contentWidth - GRID_GAP) / 2;
+  const pieWidth = Math.min(220, Math.max(180, contentWidth - 24));
 
   const statistics = useMemo(
     () => getExpenseStatistics(expenses),
@@ -43,6 +51,7 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -58,18 +67,22 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
 
         <View style={styles.statsGrid}>
           <StatCard
+            width={statCardWidth}
             label="Toplam Harcama"
             value={formatMoney(statistics.totalSpending)}
           />
           <StatCard
+            width={statCardWidth}
             label="Toplam İşlem"
             value={statistics.transactionCount.toString()}
           />
           <StatCard
+            width={statCardWidth}
             label="Ortalama Harcama"
             value={formatMoney(statistics.averageSpending)}
           />
           <StatCard
+            width={statCardWidth}
             label="En Çok Harcama Yapılan Kategori"
             value={statistics.highestSpendingCategory}
             category={highestCategory}
@@ -77,12 +90,12 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
         </View>
 
         {pieChartData.length > 0 ? (
-          <View style={styles.chartSection}>
-            <View style={styles.chartCard}>
+          <View style={styles.chartCard}>
+            <View style={styles.chartCanvas}>
               <PieChart
                 data={pieChartData}
-                width={chartWidth}
-                height={220}
+                width={pieWidth}
+                height={CHART_HEIGHT}
                 chartConfig={{
                   color: () => colors.textPrimary,
                   labelColor: () => colors.textSecondary,
@@ -92,9 +105,16 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
                 }}
                 accessor="population"
                 backgroundColor="transparent"
-                paddingLeft="12"
+                paddingLeft={String(Math.round(pieWidth / 4))}
+                hasLegend={false}
                 absolute
               />
+            </View>
+
+            <View style={styles.legendList}>
+              {statistics.categorySpending.map((item) => (
+                <ChartLegendRow key={item.category} item={item} />
+              ))}
             </View>
           </View>
         ) : null}
@@ -108,8 +128,18 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
               ))}
             </View>
           ) : (
-            <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>Henüz harcama yok</Text>
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconWrap}>
+                <Ionicons
+                  name={tabIcons.statistics.outline}
+                  size={26}
+                  color={colors.accent}
+                />
+              </View>
+              <Text style={styles.emptyTitle}>Henüz harcama yok</Text>
+              <Text style={styles.emptyText}>
+                İstatistikler, eklediğin harcamalardan oluşur.
+              </Text>
             </View>
           )}
         </View>
@@ -119,25 +149,36 @@ export function StatisticsScreen({ expenses }: StatisticsScreenProps) {
 }
 
 type StatCardProps = {
+  width: number;
   label: string;
   value: string;
   category?: string;
 };
 
-function StatCard({ label, value, category }: StatCardProps) {
+function StatCard({ width, label, value, category }: StatCardProps) {
   const styles = useThemedStyles(createStyles);
   return (
-    <View style={styles.statCard}>
+    <View style={[styles.statCard, { width }]}>
       <Text style={styles.statLabel}>{label}</Text>
       {category ? (
         <View style={styles.statValueRow}>
           <CategoryIcon category={category} size={28} />
-          <Text style={styles.statValue} numberOfLines={2}>
+          <Text
+            style={styles.statValue}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+          >
             {value}
           </Text>
         </View>
       ) : (
-        <Text style={styles.statValue} numberOfLines={2}>
+        <Text
+          style={styles.statValue}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.65}
+        >
           {value}
         </Text>
       )}
@@ -145,153 +186,257 @@ function StatCard({ label, value, category }: StatCardProps) {
   );
 }
 
-type CategoryDistributionRowProps = {
+type CategoryRowProps = {
   item: CategorySpending;
 };
 
-function CategoryDistributionRow({ item }: CategoryDistributionRowProps) {
+function ChartLegendRow({ item }: CategoryRowProps) {
   const { formatMoney } = useAppSettings();
   const styles = useThemedStyles(createStyles);
+
+  return (
+    <View style={styles.legendRow}>
+      <CategoryIcon category={item.category} size={28} />
+      <Text style={styles.legendName} numberOfLines={1}>
+        {item.category}
+      </Text>
+      <Text
+        style={styles.legendAmount}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
+        {formatMoney(item.amount)}
+      </Text>
+    </View>
+  );
+}
+
+function CategoryDistributionRow({ item }: CategoryRowProps) {
+  const { formatMoney } = useAppSettings();
+  const styles = useThemedStyles(createStyles);
+
   return (
     <View style={styles.categoryRow}>
       <CategoryIcon category={item.category} size={40} />
-      <Text style={styles.categoryName}>{item.category}</Text>
-      <View style={styles.dottedLine} />
-      <Text style={styles.categoryAmount}>{formatMoney(item.amount)}</Text>
+      <View style={styles.categoryContent}>
+        <Text style={styles.categoryName} numberOfLines={1}>
+          {item.category}
+        </Text>
+        <View style={styles.categoryMeta}>
+          <View style={styles.dottedLine} />
+          <Text
+            style={styles.categoryAmount}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+          >
+            {formatMoney(item.amount)}
+          </Text>
+        </View>
+      </View>
     </View>
   );
 }
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: 8,
-    paddingBottom: 32,
-    gap: 28,
-  },
-  header: {
-    gap: 6,
-    marginTop: 8,
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-    color: colors.textPrimary,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.textSecondary,
-    letterSpacing: 0.2,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  statCard: {
-    flexGrow: 1,
-    flexBasis: '47%',
-    minWidth: '45%',
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 8,
-  },
-  statLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-  },
-  statValue: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: -0.3,
-    flexShrink: 1,
-  },
-  statValueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  chartSection: {
-    gap: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    letterSpacing: -0.3,
-  },
-  chartCard: {
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  categorySection: {
-    gap: 16,
-  },
-  categoryList: {
-    gap: 12,
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 10,
-  },
-  categoryName: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    letterSpacing: -0.2,
-  },
-  dottedLine: {
-    flex: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    borderStyle: 'dashed',
-    marginBottom: 2,
-    minWidth: 16,
-  },
-  categoryAmount: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: -0.2,
-  },
-  emptyCard: {
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: colors.textSecondary,
-  },
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingTop: 4,
+      paddingBottom: 32,
+      gap: 22,
+    },
+    header: {
+      gap: 6,
+      marginTop: 4,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: '700',
+      letterSpacing: -0.7,
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.textSecondary,
+      letterSpacing: 0.2,
+    },
+    statsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: GRID_GAP,
+    },
+    statCard: {
+      minHeight: 118,
+      justifyContent: 'space-between',
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      paddingVertical: 16,
+      paddingHorizontal: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 10,
+    },
+    statLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.4,
+    },
+    statValue: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      letterSpacing: -0.4,
+      flexShrink: 1,
+      minWidth: 0,
+    },
+    statValueRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      minWidth: 0,
+    },
+    chartCard: {
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      paddingVertical: 18,
+      paddingHorizontal: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 16,
+    },
+    chartCanvas: {
+      width: '100%',
+      alignItems: 'center',
+      overflow: 'hidden',
+    },
+    legendList: {
+      gap: 10,
+    },
+    legendRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      minWidth: 0,
+    },
+    legendName: {
+      flex: 1,
+      minWidth: 0,
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      letterSpacing: -0.2,
+    },
+    legendAmount: {
+      maxWidth: '42%',
+      flexShrink: 0,
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      letterSpacing: -0.3,
+      textAlign: 'right',
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      letterSpacing: -0.2,
+    },
+    categorySection: {
+      gap: 16,
+    },
+    categoryList: {
+      gap: 12,
+    },
+    categoryRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      paddingVertical: 14,
+      paddingHorizontal: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 12,
+    },
+    categoryContent: {
+      flex: 1,
+      minWidth: 0,
+      gap: 8,
+    },
+    categoryName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      letterSpacing: -0.2,
+    },
+    categoryMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      minWidth: 0,
+    },
+    dottedLine: {
+      flex: 1,
+      minWidth: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      borderStyle: 'dashed',
+      opacity: 0.7,
+    },
+    categoryAmount: {
+      maxWidth: '48%',
+      flexShrink: 0,
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      letterSpacing: -0.3,
+      textAlign: 'right',
+    },
+    emptyState: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: 40,
+      paddingHorizontal: 24,
+      gap: 10,
+    },
+    emptyIconWrap: {
+      width: 52,
+      height: 52,
+      borderRadius: 16,
+      backgroundColor: colors.accentSoft,
+      borderWidth: 1,
+      borderColor: 'rgba(108, 92, 231, 0.28)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 4,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      letterSpacing: -0.3,
+      textAlign: 'center',
+    },
+    emptyText: {
+      fontSize: 15,
+      fontWeight: '500',
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
   });
 }
